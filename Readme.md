@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Александр Суходолов](https://up.htmlacademy.ru/javascript/9/user/129482).
-* Наставник: `Неизвестно`.
+* Наставник: Олег Петров (https://htmlacademy.ru/profile/fyvfyv).
 
 ---
 
