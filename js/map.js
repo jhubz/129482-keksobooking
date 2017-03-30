@@ -44,29 +44,29 @@ function generatePin(number) {
   var maxY = 500;
 
   var pin = {
-    "author": {
+    'author': {
       "avatar": 'img/avatars/user0' + (number + 1) + '.png'
     },
 
-    "offer": {
-      "title": title,
-      "address": address,
-      "price": getRandomIntNumber(minPrice, maxPrice),
-      "type": types[getRandomIntNumber(0, types.length - 1)],
-      "rooms": getRandomIntNumber(minRooms, maxRooms),
-      "guests": getRandomIntNumber(minGuests, maxGuests),
-      "checkin": times[getRandomIntNumber(0, times.length - 1)],
-      "checkout": times[getRandomIntNumber(0, times.length - 1)],
-      "features": getRandomArray(features),
-      "description": '',
-      "photos": ''
+    'offer': {
+      'title': title,
+      'address': address,
+      'price': getRandomIntNumber(minPrice, maxPrice),
+      'type': types[getRandomIntNumber(0, types.length - 1)],
+      'rooms': getRandomIntNumber(minRooms, maxRooms),
+      'guests': getRandomIntNumber(minGuests, maxGuests),
+      'checkin': times[getRandomIntNumber(0, times.length - 1)],
+      'checkout': times[getRandomIntNumber(0, times.length - 1)],
+      'features': getRandomArray(features),
+      'description': '',
+      'photos': ''
     },
 
-    "location": {
-      "x": getRandomIntNumber(minX, maxX),
-      "y": getRandomIntNumber(minY, maxY)
+    'location': {
+      'x': getRandomIntNumber(minX, maxX),
+      'y': getRandomIntNumber(minY, maxY)
     }
-  }
+  };
 
   return pin;
 }
