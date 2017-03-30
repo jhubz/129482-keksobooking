@@ -196,13 +196,17 @@ function createDialogContainer(pin) {
 
 // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ ТИПА СДАВАЕМОГО ОБЪЕКТА
 function getOfferTypeValue(pin) {
+  var value = '';
+
   if (pin.offer.type === 'flat') {
-    return 'Квартира';
+    value = 'Квартира';
   } else if (pin.offer.type === 'house') {
-    return 'Дом';
+    value = 'Дом';
   } else if (pin.offer.type === 'bungalo') {
-    return 'Бунгало';
+    value = 'Бунгало';
   }
+
+  return value;
 }
 
 // ДОБАВЛЕНИЕ ДИАЛОГА НА СТРАНИЦУ
