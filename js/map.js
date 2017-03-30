@@ -45,7 +45,7 @@ function generatePin(number) {
 
   var pin = {
     'author': {
-      "avatar": 'img/avatars/user0' + (number + 1) + '.png'
+      'avatar': 'img/avatars/user0' + (number + 1) + '.png'
     },
 
     'offer': {
@@ -196,7 +196,13 @@ function createDialogContainer(pin) {
 
 // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ ТИПА СДАВАЕМОГО ОБЪЕКТА
 function getOfferTypeValue(pin) {
-  return (pin.offer.type === 'flat') ? 'Квартира' : (pin.offer.type === 'house') ? 'Дом' : 'Бунгало';
+  if (pin.offer.type === 'flat') {
+    return 'Квартира';
+  } else if (pin.offer.type === 'house') {
+    return 'Дом';
+  } else if (pin.offer.type === 'bungalo') {
+    return 'Бунгало';
+  }
 }
 
 // ДОБАВЛЕНИЕ ДИАЛОГА НА СТРАНИЦУ
