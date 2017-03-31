@@ -208,9 +208,9 @@ function createDialogContainer(pin) {
 // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ ТИПА СДАВАЕМОГО ОБЪЕКТА
 function getOfferTypeValue(pin) {
   var offerTypes = {
-    'flat' : 'Квартира',
-    'house' : 'Дом',
-    'bungalo' : 'Бунгало'
+    'flat': 'Квартира',
+    'house': 'Дом',
+    'bungalo': 'Бунгало'
   };
 
   var value = '';
