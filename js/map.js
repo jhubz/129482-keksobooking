@@ -13,12 +13,15 @@ function getRandomIntNumber(min, max) {
 // ПОЛУЧЕНИЕ СЛУЧАЙНОЙ ВЫБОРКИ ИЗ МАССИВА
 function getRandomArray(array) {
   var randomArray = [];
+  var randomIndex;
+  var randomArrayLength = getRandomIntNumber(0, array.length);
+  var randomArrayValue;
   var i;
 
-  for (i = 0; i < array.length; i++) {
-    if (getRandomIntNumber(0, 1) >= 0.5) {
-      randomArray.push(array[i]);
-    }
+  for (i = 0; i < randomArrayLength; i++) {
+    randomIndex = getRandomIntNumber(0, array.length - 1);
+    randomArrayValue = array.splice(randomIndex, 1)[0];
+    randomArray.push(randomArrayValue);
   }
 
   return randomArray;
@@ -26,39 +29,35 @@ function getRandomArray(array) {
 
 // ПОЛУЧЕНИЕ ПУТИ К ФАЙЛУ АВАТАРКИ
 function getAvatarPath(number) {
-  number++;
-  var avatarPath = 'img/avatars/user0' + number + '.png';
+  var avatarPathStatic = 'img/avatars/user';
+  var avatarImageExtension = '.png';
+  var avatarPathFull;
 
-  return avatarPath;
+  number++;
+  number = (number >= 10) ? number.toString() : '0' + number;
+  avatarPathFull = avatarPathStatic + number + avatarImageExtension;
+
+  return avatarPathFull;
 }
 
 // СОЗДАНИЕ ОБЪЯВЛЕНИЯ
 function generatePin(number) {
-  var minX = 300;
-  var maxX = 900;
-  var minY = 100;
-  var maxY = 500;
-  var locationX = getRandomIntNumber(minX, maxX);
-  var locationY = getRandomIntNumber(minY, maxY);
+  var MIN_X = 300;
+  var MAX_X = 900;
+  var MIN_Y = 100;
+  var MAX_Y = 500;
+  var locationX = getRandomIntNumber(MIN_X, MAX_X);
+  var locationY = getRandomIntNumber(MIN_Y, MAX_Y);
 
-  var address = locationX + ', ' + locationY;
-
-  var minPrice = 1000;
-  var maxPrice = 1000000;
-  var price = getRandomIntNumber(minPrice, maxPrice);
+  var MIN_PRICE = 1000;
+  var MAX_PRICE = 1000000;
 
   var types = ['flat', 'house', 'bungalo'];
-  var type = types[getRandomIntNumber(0, types.length - 1)];
 
-  var minRooms = 1;
-  var maxRooms = 5;
-  var rooms = getRandomIntNumber(minRooms, maxRooms);
-
-  var guests = getRandomIntNumber(1, 30);
+  var MIN_ROOMS = 1;
+  var MAX_ROOMS = 5;
 
   var times = ['12:00', '13:00', '14:00'];
-  var checkin = times[getRandomIntNumber(0, times.length - 1)];
-  var checkout = times[getRandomIntNumber(0, times.length - 1)];
 
   var features = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 
@@ -69,13 +68,13 @@ function generatePin(number) {
 
     'offer': {
       'title': '',
-      'address': address,
-      'price': price,
-      'type': type,
-      'rooms': rooms,
-      'guests': guests,
-      'checkin': checkin,
-      'checkout': checkout,
+      'address': locationX + ', ' + locationY,
+      'price': getRandomIntNumber(MIN_PRICE, MAX_PRICE),
+      'type': types[getRandomIntNumber(0, types.length - 1)],
+      'rooms': getRandomIntNumber(MIN_ROOMS, MAX_ROOMS),
+      'guests': getRandomIntNumber(1, 30),
+      'checkin': times[getRandomIntNumber(0, times.length - 1)],
+      'checkout': times[getRandomIntNumber(0, times.length - 1)],
       'features': getRandomArray(features),
       'description': '',
       'photos': ''
@@ -175,17 +174,17 @@ function addPinMarksOnPage(array) {
 }
 
 // СОЗДАНИЕ МАССИВА РАЗМЕТОК УДОБСТВ
-function createFeaturesMark(pin) {
+function createPinFeaturesMark(pinFeaturesArray) {
   var featureElement;
   var fragment = document.createDocumentFragment();
 
   var i;
 
-  for (i = 0; i < pin.offer.features.length; i++) {
+  for (i = 0; i < pinFeaturesArray.length; i++) {
     featureElement = document.createElement('span');
 
     featureElement.classList.add('feature__image');
-    featureElement.classList.add('feature__image--' + pin.offer.features[i]);
+    featureElement.classList.add('feature__image--' + pinFeaturesArray[i]);
 
     fragment.appendChild(featureElement);
   }
@@ -213,14 +212,7 @@ function getOfferTypeValue(pin) {
     'bungalo': 'Бунгало'
   };
 
-  var value = '';
-  var key;
-
-  for (key in offerTypes) {
-    if (pin.offer.type === key) {
-      value = offerTypes[key];
-    }
-  }
+  var value = offerTypes[pin.offer.type];
 
   return value;
 }
@@ -251,7 +243,7 @@ function addDialogOnPage(pin) {
   type.textContent = getOfferTypeValue(pin);
   guestsRooms.textContent = 'Для ' + pin.offer.guests + ' гостей в ' + pin.offer.rooms + ' комнатах';
   checkinOut.textContent = 'Заезд после ' + pin.offer.checkin + ', выезд до ' + pin.offer.checkout;
-  features.appendChild(createFeaturesMark(pin));
+  features.appendChild(createPinFeaturesMark(pin.offer.features));
   description.textContent = pin.offer.description;
 
   dialogContainer.appendChild(dialogElement);
