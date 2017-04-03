@@ -29,13 +29,11 @@ function getRandomArray(array) {
 
 // ПОЛУЧЕНИЕ ПУТИ К ФАЙЛУ АВАТАРКИ
 function getAvatarPath(number) {
-  var avatarPathStatic = 'img/avatars/user';
-  var avatarImageExtension = '.png';
   var avatarPathFull;
 
   number++;
   number = (number >= 10) ? number.toString() : '0' + number;
-  avatarPathFull = avatarPathStatic + number + avatarImageExtension;
+  avatarPathFull = 'img/avatars/user' + number + '.png';
 
   return avatarPathFull;
 }
