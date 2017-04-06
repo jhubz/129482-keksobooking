@@ -1,6 +1,7 @@
 'use strict';
 
-var pinMap = document.querySelector('.tokyo__pin-map');
+var tokyo = document.querySelector('.tokyo');
+var pinMap = tokyo.querySelector('.tokyo__pin-map');
 
 // ПОЛУЧЕНИЕ СЛУЧАЙНОГО ЦЕЛОГО ЧИСЛА ИЗ ЗАДАННОГО ДИАПАЗОНА
 function getRandomIntNumber(min, max) {
@@ -195,8 +196,10 @@ function createDialogContainer(pin) {
   var dialogContainerTemplate = document.querySelector('#dialog-container-template');
   var dialogContainerElement = dialogContainerTemplate.content.cloneNode(true);
 
+  var dialogTitle = dialogContainerElement.querySelector('.dialog-title');
   var dialogTitleImage = dialogContainerElement.querySelector('.dialog-title img');
 
+  dialogTitle.style.position = 'relative';
   dialogTitleImage.setAttribute('src', pin.author.avatar);
 
   return dialogContainerElement;
@@ -217,7 +220,7 @@ function getOfferTypeValue(pin) {
 
 // ДОБАВЛЕНИЕ ДИАЛОГА НА СТРАНИЦУ
 function addDialogOnPage(pin) {
-  var tokyo = document.querySelector('.tokyo');
+  var currentDialog = tokyo.querySelector('.dialog');
 
   var dialogContainerElement = createDialogContainer(pin);
   var dialogContainer = dialogContainerElement.querySelector('.dialog');
@@ -246,16 +249,126 @@ function addDialogOnPage(pin) {
 
   dialogContainer.appendChild(dialogElement);
 
-  tokyo.replaceChild(dialogContainerElement, offerDialog);
+  if (offerDialog) {
+    tokyo.replaceChild(dialogContainerElement, offerDialog);
+  } else {
+    tokyo.replaceChild(dialogContainerElement, currentDialog);
+  }
 }
 
+// ДОБАВЛЕНИЕ LISTENER К ОБЪЯВЛЕНИЯМ
+function addListenersToPins(pins) {
+  var pinsOnMap = pinMap.querySelectorAll('div.pin:not(.pin__main)');
+
+  var i;
+
+  var unselectPins = function () {
+    for (i = 0; i < pinsOnMap.length; i++) {
+      if (pinsOnMap[i].classList.contains('pin--active')) {
+        pinsOnMap[i].classList.remove('pin--active');
+      }
+    }
+  };
+
+  var onDialogEscPress = function (evt) {
+    if (evt.keyCode === 27) {
+      closeDialog(evt);
+    }
+  };
+
+  var onDialogCloseClick = function (evt) {
+    if (evt.target.parentElement.classList.contains('dialog__close')) {
+      closeDialog(evt);
+    }
+  };
+
+  var onDialogCloseEnterPress = function (evt) {
+    if (evt.keyCode === 13) {
+      closeDialog(evt);
+    }
+  };
+
+  // ОТКРЫТИЕ ДИАЛОГА
+  var openDialog = function (evt) {
+
+    var evtTarget;
+    if (evt.target.classList.value === 'pin') {
+      evtTarget = evt.target;
+    } else if (evt.target.parentElement.classList.value === 'pin') {
+      evtTarget = evt.target.parentElement;
+    }
+
+    var dialog;
+    var dialogCloseButton;
+
+    unselectPins();
+
+    evtTarget.classList.add('pin--active');
+    for (i = 0; i < pins.length; i++) {
+      if (evtTarget.childNodes[1].getAttribute('src') === pins[i].author.avatar) {
+        addDialogOnPage(pins[i]);
+      }
+    }
+
+    dialog = tokyo.querySelector('.dialog');
+    dialogCloseButton = dialog.querySelector('.dialog__close');
+
+    document.addEventListener('keydown', onDialogEscPress);
+    dialogCloseButton.addEventListener('keydown', onDialogCloseEnterPress);
+    dialogCloseButton.addEventListener('click', onDialogCloseClick);
+
+  };
+
+  // ЗАКРЫТИЕ ДИАЛОГА
+  var closeDialog = function (evt) {
+    var dialog = tokyo.querySelector('.dialog');
+    var dialogCloseButton = dialog.querySelector('.dialog__close');
+
+    document.removeEventListener('keydown', onDialogEscPress);
+    dialogCloseButton.removeEventListener('keydown', onDialogCloseEnterPress);
+    dialogCloseButton.removeEventListener('click', onDialogCloseClick);
+
+    unselectPins();
+    dialog.style.display = 'none';
+
+  };
+
+  pinMap.addEventListener('click', function (evt) {
+    openDialog(evt);
+  });
+
+  pinMap.addEventListener('keydown', function (evt) {
+    if (evt.keyCode === 13) {
+      openDialog(evt);
+    }
+  });
+
+}
+
+// ДОБАВЛЕНИЕ ПЕРВОГО ОБЪЯВЛЕНИЯ
+function initFirstPin(pin) {
+  var pinsOnMap = pinMap.querySelectorAll('div.pin:not(.pin__main)');
+
+  addDialogOnPage(pin);
+  for (var i = 0; i < pinsOnMap.length; i++) {
+    if (pin.author.avatar === pinsOnMap[i].childNodes[1].getAttribute('src')) {
+      pinsOnMap[i].classList.add('pin--active');
+    }
+  }
+
+}
+
+// СОЗДАНИЕ КАРТЫ С ОБЪЯВЛЕНИЯМИ
 function generateMap() {
   var pins = generatePins();
   setPinTitles(pins);
   var pinMarks = createPinMarks(pins);
 
   addPinMarksOnPage(pinMarks);
-  addDialogOnPage(pins[0]);
+
+  addListenersToPins(pins);
+
+  initFirstPin(pins[0]);
 }
 
 generateMap();
