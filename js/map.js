@@ -1,16 +1,12 @@
 'use strict';
 
-var tokyo = document.querySelector('.tokyo');
-var pinMap = tokyo.querySelector('.tokyo__pin-map');
-var selectedPin;
-
 // ПОЛУЧЕНИЕ СЛУЧАЙНОГО ЦЕЛОГО ЧИСЛА ИЗ ЗАДАННОГО ДИАПАЗОНА
-function getRandomIntNumber(min, max) {
+var getRandomIntNumber = function (min, max) {
   return Math.floor(Math.random() * (max + 1 - min) + min);
-}
+};
 
 // ПОЛУЧЕНИЕ СЛУЧАЙНОЙ ВЫБОРКИ ИЗ МАССИВА
-function getRandomArray(array) {
+var getRandomArray = function (array) {
   var randomArray = [];
   var randomIndex;
   var randomArrayLength = getRandomIntNumber(0, array.length);
@@ -23,10 +19,10 @@ function getRandomArray(array) {
   }
 
   return randomArray;
-}
+};
 
 // ПОЛУЧЕНИЕ ПУТИ К ФАЙЛУ АВАТАРКИ
-function getAvatarPath(number) {
+var getAvatarPath = function (number) {
   var avatarPathFull;
 
   number++;
@@ -34,10 +30,10 @@ function getAvatarPath(number) {
   avatarPathFull = 'img/avatars/user' + number + '.png';
 
   return avatarPathFull;
-}
+};
 
 // СОЗДАНИЕ ОБЪЯВЛЕНИЯ
-function generatePin(number) {
+var generatePin = function (number) {
   var MIN_X = 300;
   var MAX_X = 900;
   var MIN_Y = 100;
@@ -83,10 +79,10 @@ function generatePin(number) {
   };
 
   return pin;
-}
+};
 
 // СОЗДАНИЕ МАССИВА ОБЪЯВЛЕНИЙ
-function generatePins() {
+var generatePins = function () {
   var pins = [];
   var pinsCount = 8;
 
@@ -95,10 +91,10 @@ function generatePins() {
   }
 
   return pins;
-}
+};
 
 // ПРИСВОЕНИЕ TITLE ДЛЯ ОБЪЯВЛЕНИЙ
-function setPinTitles(array) {
+var setPinTitles = function (pins) {
   var titles = [
     'Большая уютная квартира',
     'Маленькая неуютная квартира',
@@ -113,57 +109,60 @@ function setPinTitles(array) {
 
   var randomIndex;
 
-  for (var i = 0; i < array.length; i++) {
+  for (var i = 0; i < pins.length; i++) {
     randomIndex = getRandomIntNumber(0, titles.length - 1);
     title = titles.splice(randomIndex, 1)[0];
-    array[i].offer.title = title;
+    pins[i].offer.title = title;
   }
-}
+};
 
 // СОЗДАНИЕ РАЗМЕТКИ ОБЪЯВЛЕНИЯ
-function createPinMark(x, y, avatarPath) {
-  var pinTemplate = document.querySelector('#pin-template');
-  var pinElement = pinTemplate.content.cloneNode(true);
+var createPinMark = function (pin) {
+  var pinMarkTemplate = document.querySelector('#pin-template');
+  var pinMarkElement = pinMarkTemplate.content.cloneNode(true);
 
-  var pin = pinElement.querySelector('.pin');
-  var pinImage = pin.querySelector('img');
+  var pinMark = pinMarkElement.querySelector('.pin');
+  var pinMarkImage = pinMark.querySelector('img');
 
-  var pinWidth = 56;
-  var pinHeight = 75;
-  var pinStyle = 'left: ' + (x - pinWidth / 2) + 'px; top: ' + (y - pinHeight) + 'px';
+  var pinMarkWidth = 56;
+  var pinMarkHeight = 75;
+  var pinMarkStyle = 'left: ' + (pin.location.x - pinMarkWidth / 2) + 'px; top: ' + (pin.location.y - pinMarkHeight) + 'px';
 
-  pin.setAttribute('style', pinStyle);
-  pinImage.setAttribute('src', avatarPath);
+  pinMark.setAttribute('style', pinMarkStyle);
+  pinMarkImage.setAttribute('src', pin.author.avatar);
 
-  return pinElement;
-}
+  addListenerToPinMark(pinMark, pin);
+
+  return pinMarkElement;
+};
 
 // СОЗДАНИЕ МАССИВА РАЗМЕТОК ДЛЯ ОБЪЯВЛЕНИЙ
-function createPinMarks(array) {
+var createPinMarks = function (pins) {
   var pinMark;
   var pinMarks = [];
 
-  for (var i = 0; i < array.length; i++) {
-    pinMark = createPinMark(array[i].location.x, array[i].location.y, array[i].author.avatar);
+  for (var i = 0; i < pins.length; i++) {
+    pinMark = createPinMark(pins[i]);
     pinMarks.push(pinMark);
   }
 
   return pinMarks;
-}
+};
 
 // ДОБАВЛЕНИЕ РАЗМЕТКИ ОБЪЯВЛЕНИЙ НА СТРАНИЦУ
-function addPinMarksOnPage(array) {
+var addPinMarksOnPage = function (pinMarks) {
+  var pinMap = document.querySelector('.tokyo__pin-map');
   var fragment = document.createDocumentFragment();
 
-  for (var i = 0; i < array.length; i++) {
-    fragment.appendChild(array[i]);
+  for (var i = 0; i < pinMarks.length; i++) {
+    fragment.appendChild(pinMarks[i]);
   }
 
   pinMap.appendChild(fragment);
-}
+};
 
 // СОЗДАНИЕ МАССИВА РАЗМЕТОК УДОБСТВ
-function createPinFeaturesMark(pinFeaturesArray) {
+var createPinFeaturesMark = function (pinFeaturesArray) {
   var featureElement;
   var fragment = document.createDocumentFragment();
 
@@ -177,22 +176,10 @@ function createPinFeaturesMark(pinFeaturesArray) {
   }
 
   return fragment;
-}
-
-// СОЗДАНИЕ РАЗМЕТКИ КОНТЕЙНЕРА ДЛЯ ДИАЛОГА
-function createDialogContainer(pin) {
-  var dialogContainerTemplate = document.querySelector('#dialog-container-template');
-  var dialogContainerElement = dialogContainerTemplate.content.cloneNode(true);
-
-  var dialogTitleImage = dialogContainerElement.querySelector('.dialog__title img');
-
-  dialogTitleImage.setAttribute('src', pin.author.avatar);
-
-  return dialogContainerElement;
-}
+};
 
 // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ ТИПА СДАВАЕМОГО ОБЪЕКТА
-function getOfferTypeValue(pin) {
+var getOfferTypeValue = function (pin) {
   var offerTypes = {
     'flat': 'Квартира',
     'house': 'Дом',
@@ -202,206 +189,146 @@ function getOfferTypeValue(pin) {
   var value = offerTypes[pin.offer.type];
 
   return value;
-}
+};
 
-// СОЗДАНИЕ ДИАЛОГА
-function createDialog(pin) {
-  var dialogContainerElement = createDialogContainer(pin);
-  var dialogContainer = dialogContainerElement.querySelector('.dialog');
+// СКРЫВАНИЕ ЭЛЕМЕНТА
+var hideElement = function (element) {
+  element.classList.add('hidden');
+};
 
-  var offerDialogTemplate = document.querySelector('#lodge-template');
-  var dialogElement = offerDialogTemplate.content.cloneNode(true);
+// ОТОБРАЖЕНИЕ ЭЛЕМЕНТА
+var showElement = function (element) {
+  element.classList.remove('hidden');
+};
 
-  var title = dialogElement.querySelector('.lodge__title');
-  var address = dialogElement.querySelector('.lodge__address');
-  var price = dialogElement.querySelector('.lodge__price');
-  var type = dialogElement.querySelector('.lodge__type');
-  var guestsRooms = dialogElement.querySelector('.lodge__rooms-and-guests');
-  var checkinOut = dialogElement.querySelector('.lodge__checkin-time');
-  var features = dialogElement.querySelector('.lodge__features');
-  var description = dialogElement.querySelector('.lodge__description');
+// УДАЛЕНИЕ ВСЕХ ДОЧЕРНИХ ЭЛЕМЕНТОВ
+var removeAllChild = function (element) {
+  element.innerHTML = null;
+};
+
+// ЗАПОЛНЕНИЕ ДИАЛОГА ИНФОРМАЦИЕЙ
+var fillDialogFields = function (pin) {
+  var dialog = document.querySelector('.dialog');
+
+  var title = dialog.querySelector('.lodge__title');
+  var titleImage = dialog.querySelector('.dialog__title img');
+
+  var address = dialog.querySelector('.lodge__address');
+  var price = dialog.querySelector('.lodge__price');
+  var type = dialog.querySelector('.lodge__type');
+  var guestsRooms = dialog.querySelector('.lodge__rooms-and-guests');
+  var checkinOut = dialog.querySelector('.lodge__checkin-time');
+  var features = dialog.querySelector('.lodge__features');
+  var description = dialog.querySelector('.lodge__description');
 
   title.textContent = pin.offer.title;
+  titleImage.setAttribute('src', pin.author.avatar);
+
   address.textContent = pin.offer.address;
   price.innerHTML = pin.offer.price + '&#x20bd;' + '/ночь';
   type.textContent = getOfferTypeValue(pin);
   guestsRooms.textContent = 'Для ' + pin.offer.guests + ' гостей в ' + pin.offer.rooms + ' комнатах';
   checkinOut.textContent = 'Заезд после ' + pin.offer.checkin + ', выезд до ' + pin.offer.checkout;
+
+  removeAllChild(features);
   features.appendChild(createPinFeaturesMark(pin.offer.features));
+
   description.textContent = pin.offer.description;
+};
 
-  dialogContainer.appendChild(dialogElement);
+// ПРОВЕРКА НАЖАТИЯ ESC
+var isEscPress = function (evt) {
+  return evt.keyCode === 27;
+};
 
-  return dialogContainerElement;
-}
+// ПРОВЕРКА НАЖАТИЯ ENTER
+var isEnterPress = function (evt) {
+  return evt.keyCode === 13;
+};
 
-// УДАЛЕНИЕ ДИАЛОГА СО СТРАНИЦЫ
-function removeDialogFromPage(dialog) {
-  tokyo.removeChild(dialog);
-}
-
-// ДОБАВЛЕНИЕ ДИАЛОГА НА СТРАНИЦУ
-function addDialogOnPage(dialogContainerElement) {
-  tokyo.appendChild(dialogContainerElement);
-}
-
-// СКРЫВАНИЕ ДИАЛОГА
-function hideDialog(dialog) {
-  dialog.classList.add('hidden');
-}
-
-// ОТОБРАЖЕНИЕ ДИАЛОГА
-function showDialog(dialog) {
-  dialog.classList.remove('hidden');
-}
-
-// УДАЛЕНИЕ ВСЕХ ДОЧЕРНИХ ЭЛЕМЕНТОВ
-function removeAllChild(element) {
-  while (element.childNodes[0]) {
-    element.removeChild(element.childNodes[0]);
+// АКТИВАЦИЯ PIN
+var activatePin = function (pinMark) {
+  if (pinMark) {
+    pinMark.classList.add('pin--active');
   }
-}
+};
 
-// ЗАПОЛНЕНИЕ ДИАЛОГА ИНФОРМАЦИЕЙ
-function fillPinContent(pin, dialogContent) {
-  dialogContent.titleImage.setAttribute('src', pin.author.avatar);
+// ДЕАКТИВАЦИЯ PIN
+var unActivateSelectedPin = function () {
+  var selectedPin = document.querySelector('.pin--active');
 
-  dialogContent.title.textContent = pin.offer.title;
-  dialogContent.address.textContent = pin.offer.address;
-  dialogContent.price.innerHTML = pin.offer.price + '&#x20bd;' + '/ночь';
-  dialogContent.type.textContent = getOfferTypeValue(pin);
-  dialogContent.guestsRooms.textContent = 'Для ' + pin.offer.guests + ' гостей в ' + pin.offer.rooms + ' комнатах';
-  dialogContent.checkinOut.textContent = 'Заезд после ' + pin.offer.checkin + ', выезд до ' + pin.offer.checkout;
+  if (selectedPin) {
+    selectedPin.classList.remove('pin--active');
+  }
+};
 
-  removeAllChild(dialogContent.features);
-  dialogContent.features.appendChild(createPinFeaturesMark(pin.offer.features));
+// ЗАКРЫТИЕ ДИАЛОГА ПРИ НАЖАТИИ ESC
+var onDialogEscPress = function (evt) {
+  if (isEscPress(evt)) {
+    unActivateSelectedPin();
+    closeDialog(evt);
+  }
+};
 
-  dialogContent.description.textContent = pin.offer.description;
-}
+// ЗАКРЫТИЕ ДИАЛОГА ПРИ КЛИКЕ НА КНОПКЕ ЗАКРЫТИЯ ДИАЛОГА
+var onDialogCloseClick = function (evt) {
+  evt.preventDefault();
+  unActivateSelectedPin();
+  closeDialog(evt);
+};
 
-// ДОБАВЛЕНИЕ LISTENER К ОБЪЯВЛЕНИЯМ
-function addListenersToMap(pins) {
-  var pinsOnMap = pinMap.querySelectorAll('.pin:not(.pin__main)');
-  var dialog = tokyo.querySelector('.dialog');
+// ОТКРЫТИЕ ДИАЛОГА
+var openDialog = function (evt) {
+  var dialog = document.querySelector('.dialog');
   var dialogCloseButton = dialog.querySelector('.dialog__close');
 
-  var dialogContent = {
-    title: dialog.querySelector('.lodge__title'),
-    titleImage: dialog.querySelector('.dialog__title img'),
+  document.addEventListener('keydown', onDialogEscPress);
+  dialogCloseButton.addEventListener('click', onDialogCloseClick);
 
-    address: dialog.querySelector('.lodge__address'),
-    price: dialog.querySelector('.lodge__price'),
-    type: dialog.querySelector('.lodge__type'),
-    guestsRooms: dialog.querySelector('.lodge__rooms-and-guests'),
-    checkinOut: dialog.querySelector('.lodge__checkin-time'),
-    features: dialog.querySelector('.lodge__features'),
-    description: dialog.querySelector('.lodge__description')
-  };
+  showElement(dialog);
+};
 
-  var unActivatePin = function (pin) {
-    if (pin) {
-      pin.classList.remove('pin--active');
-    }
-  };
+// ЗАКРЫТИЕ ДИАЛОГА
+var closeDialog = function (evt) {
+  var dialog = document.querySelector('.dialog');
 
-  var activatePin = function (pin) {
-    if (pin) {
-      pin.classList.add('pin--active');
-    }
-  };
-
-  var isEscPress = function (evt) {
-    return evt.keyCode === 27;
-  };
-
-  var isEnterPress = function (evt) {
-    return evt.keyCode === 13;
-  };
-
-  var isDialogCloseClick = function (evt) {
-    return evt.target.parentElement.classList.contains('dialog__close');
-  };
-
-  var onDialogEscPress = function (evt) {
-    if (isEscPress(evt)) {
-      closeDialog(evt);
-    }
-  };
-
-  var onDialogCloseClick = function (evt) {
-    if (isDialogCloseClick) {
-      closeDialog(evt);
-    }
-  };
-
-  var onDialogCloseEnterPress = function (evt) {
-    if (isEnterPress(evt)) {
-      closeDialog(evt);
-    }
-  };
-
-  // ОТКРЫТИЕ ДИАЛОГА
-  var openDialog = function (evt) {
-    showDialog(dialog);
-
-    unActivatePin(selectedPin);
-    selectedPin = evt.currentTarget;
-    activatePin(selectedPin);
-
-    for (var i = 0; i < pinsOnMap.length; i++) {
-      if (evt.currentTarget === pinsOnMap[i]) {
-        fillPinContent(pins[i], dialogContent);
-      }
-    }
-
-    document.addEventListener('keydown', onDialogEscPress);
-    dialogCloseButton.addEventListener('keydown', onDialogCloseEnterPress);
-    dialogCloseButton.addEventListener('click', onDialogCloseClick);
-  };
-
-  // ЗАКРЫТИЕ ДИАЛОГА
-  var closeDialog = function (evt) {
+  if (evt) {
     document.removeEventListener('keydown', onDialogEscPress);
-    dialogCloseButton.removeEventListener('keydown', onDialogCloseEnterPress);
-    dialogCloseButton.removeEventListener('click', onDialogCloseClick);
-
-    unActivatePin(selectedPin);
-    selectedPin = null;
-    hideDialog(dialog);
-  };
-
-  hideDialog(dialog);
-
-  for (var i = 0; i < pinsOnMap.length; i++) {
-    pinsOnMap[i].addEventListener('click', function (evt) {
-      openDialog(evt);
-    });
-
-    pinsOnMap[i].addEventListener('click', openDialog);
-
-    pinsOnMap[i].addEventListener('keydown', function (evt) {
-      if (isEnterPress(evt)) {
-        openDialog(evt);
-      }
-    });
+    evt.currentTarget.removeEventListener('click', onDialogCloseClick);
   }
 
-}
+  hideElement(dialog);
+};
+
+// КЛИК НА PIN'Е
+var onPinClick = function (evt, pin) {
+  unActivateSelectedPin();
+  activatePin(evt.currentTarget);
+  fillDialogFields(pin);
+  openDialog(evt);
+};
+
+// ДОБАВЛЕНИЕ СЛУШАТЕЛЯ К PIN
+var addListenerToPinMark = function (pinMark, pin) {
+  pinMark.addEventListener('click', function (evt) {
+    onPinClick(evt, pin);
+  });
+
+  pinMark.addEventListener('keydown', function (evt) {
+    if (isEnterPress(evt)) {
+      onPinClick(evt, pin);
+    }
+  });
+};
 
 // СОЗДАНИЕ КАРТЫ С ОБЪЯВЛЕНИЯМИ
-function generateMap() {
+var generateMap = function () {
   var pins = generatePins();
   var pinMarks = createPinMarks(pins);
-  var offerDialog = tokyo.querySelector('#offer-dialog');
-
-  removeDialogFromPage(offerDialog);
 
   setPinTitles(pins);
   addPinMarksOnPage(pinMarks);
-
-  addDialogOnPage(createDialog(pins[0]));
-
-  addListenersToMap(pins);
-}
+  closeDialog();
+};
 
 generateMap();
