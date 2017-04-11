@@ -331,4 +331,173 @@ var generateMap = function () {
   closeDialog();
 };
 
+// ПРОВЕРКА ПОЛЯ НА ВАЛИДНОСТЬ
+var isValidInput = function (input) {
+  var isValid = true;
+
+  isValid = !input.validity.rangeOverflow;
+
+  if (isValid) {
+    isValid = !input.validity.rangeUnderflow;
+  }
+
+  if (isValid) {
+    isValid = !input.validity.tooLong;
+  }
+
+  if (isValid) {
+    isValid = !input.validity.tooShort;
+  }
+
+  if (isValid) {
+    isValid = !input.validity.typeMismatch;
+  }
+
+  if (isValid) {
+    isValid = !input.validity.valueMissing;
+  }
+
+  return isValid;
+};
+
+// ДОБАВЛЕНИЕ КРАСНОЙ РАМКИ ДЛЯ НЕВАЛИДНЫХ ПОЛЕЙ
+var colorInvalidFormFields = function (invalidFields) {
+  for (var i = 0; i < invalidFields.length; i++) {
+    invalidFields[i].classList.add('invalid');
+  }
+};
+
+// УДАЛЕНИЕ КРАСНОЙ РАМКИ СО ВСЕХ НЕВАЛИДНЫХ ПОЛЕЙ
+var unColorInvalidFormFields = function (form) {
+  var invalidFields = form.querySelectorAll('.invalid');
+  for (var i = 0; i < invalidFields.length; i++) {
+    invalidFields[i].classList.remove('invalid');
+  }
+};
+
+// ПОЛУЧЕНИЕ НЕВАЛИДНЫХ ПОЛЕЙ ФОРМЫ
+var getInvalidFieldsNoticeForm = function (evt, noticeForm) {
+  var noticeFormTitle = noticeForm.querySelector('#title');
+  var noticeFormPrice = noticeForm.querySelector('#price');
+  var invalidFields = [];
+
+  if (!isValidInput(noticeFormTitle)) {
+    invalidFields.push(noticeFormTitle);
+  }
+
+  if (!isValidInput(noticeFormPrice)) {
+    invalidFields.push(noticeFormPrice);
+  }
+
+  return invalidFields;
+};
+
+// ДОБАВЛЕНИЕ ВАЛИДАЦИИ ФОРМЫ NOTICE
+var addNoticeFormValidation = function (noticeForm) {
+  var noticeFormSubmit = noticeForm.querySelector('.form__submit');
+
+  noticeFormSubmit.addEventListener('click', function (evt) {
+    var invalidFields = [];
+
+    unColorInvalidFormFields(noticeForm);
+    invalidFields = getInvalidFieldsNoticeForm(evt, noticeForm);
+
+    if (invalidFields.length !== 0) {
+      evt.preventDefault();
+      colorInvalidFormFields(invalidFields);
+    }
+
+  });
+};
+
+// ДОБАВЛЕНИЕ СИНХРОНИЗИЦИИ TIME К ФОРМЕ NOTICE
+var addNoticeFormTimeSync = function (noticeForm) {
+  var time = noticeForm.querySelector('#time');
+  var timeout = noticeForm.querySelector('#timeout');
+
+  time.addEventListener('change', function () {
+    timeout.value = time.value;
+  });
+
+  timeout.addEventListener('change', function () {
+    time.value = timeout.value;
+  });
+};
+
+// ДОБАВЛЕНИЕ СИНХРОНИЗИЦИИ МИНИМАЛЬНОЙ ЦЕНЫ К ФОРМЕ NOTICE
+var addNoticeFormMinPriceSync = function (noticeForm) {
+  var type = noticeForm.querySelector('#type');
+  var price = noticeForm.querySelector('#price');
+
+  var minPrices = {
+    'flat': 1000,
+    'shack': 0,
+    'palace': 10000
+  };
+
+  type.addEventListener('change', function () {
+    price.value = minPrices[type.value];
+    price.setAttribute('min', minPrices[type.value]);
+  });
+
+};
+
+// ДОБАВЛЕНИЕ СИНХРОНИЗИЦИИ ГОСТЕЙ К ФОРМЕ NOTICE
+var addNoticeFormGuestsSync = function (noticeForm) {
+  var roomNumber = noticeForm.querySelector('#room_number');
+  var capacity = noticeForm.querySelector('#capacity');
+
+  var roomsCapacity = {
+    '1': 0,
+    '2': 3,
+    '100': 3
+  };
+
+  var guestsCapacity = {
+    '0': 1,
+    '3': 2
+  };
+
+  roomNumber.addEventListener('change', function () {
+    capacity.value = roomsCapacity[roomNumber.value];
+  });
+
+  capacity.addEventListener('change', function () {
+    roomNumber.value = guestsCapacity[capacity.value];
+  });
+};
+
+var initForm = function (noticeForm) {
+  var type = noticeForm.querySelector('#type');
+  var price = noticeForm.querySelector('#price');
+
+  var roomNumber = noticeForm.querySelector('#room_number');
+  var capacity = noticeForm.querySelector('#capacity');
+
+  var time = noticeForm.querySelector('#time');
+  var timeout = noticeForm.querySelector('#timeout');
+
+  type.value = 'flat';
+  price.value = 1000;
+
+  roomNumber.value = '1';
+  capacity.value = '0';
+
+  time.value = '12';
+  timeout.value = '12';
+};
+
+// ДОБАВЛЕНИЕ ФУНКЦИОНАЛА К ФОРМЕ NOTICE
+var addFunctionalToNoticeForm = function () {
+  var noticeForm = document.querySelector('.notice__form');
+
+  initForm(noticeForm);
+
+  addNoticeFormValidation(noticeForm);
+  addNoticeFormTimeSync(noticeForm);
+  addNoticeFormMinPriceSync(noticeForm);
+  addNoticeFormGuestsSync(noticeForm);
+};
+
 generateMap();
+addFunctionalToNoticeForm();
