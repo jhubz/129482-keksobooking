@@ -1,5 +1,15 @@
 'use strict';
 
+var noticeForm = document.querySelector('.notice__form');
+
+var noticeFormTitle = noticeForm.querySelector('#title');
+var noticeFormType = noticeForm.querySelector('#type');
+var noticeFormPrice = noticeForm.querySelector('#price');
+var noticeFormRoomNumber = noticeForm.querySelector('#room_number');
+var noticeFormCapacity = noticeForm.querySelector('#capacity');
+var noticeFormTime = noticeForm.querySelector('#time');
+var noticeFormTimeout = noticeForm.querySelector('#timeout');
+
 // ПОЛУЧЕНИЕ СЛУЧАЙНОГО ЦЕЛОГО ЧИСЛА ИЗ ЗАДАННОГО ДИАПАЗОНА
 var getRandomIntNumber = function (min, max) {
   return Math.floor(Math.random() * (max + 1 - min) + min);
@@ -331,4 +341,124 @@ var generateMap = function () {
   closeDialog();
 };
 
+// ДОБАВЛЕНИЕ АТРИБУТОВ ДЛЯ ВАЛИДАЦИИ ФОРМЫ
+var addValidityAttributesToNoticeForm = function () {
+  noticeFormTitle.setAttribute('required', 'required');
+  noticeFormTitle.setAttribute('minlength', 30);
+  noticeFormTitle.setAttribute('maxlength', 100);
+
+  noticeFormPrice.setAttribute('required', 'required');
+  noticeFormPrice.setAttribute('value', 1000);
+  noticeFormPrice.setAttribute('min', 1000);
+  noticeFormPrice.setAttribute('max', 1000000);
+};
+
+// ЗАПОЛНЕНИЕ ФОРМЫ ЗНАЧЕНИЯМИ ПО УМОЛЧАНИЮ
+var fillNoticeFormDefaultValues = function () {
+  var DEFAULT_TITLE_VALUE = '';
+  var DEFAULT_TYPE_VALUE = 'flat';
+  var DEFAULT_PRICE_VALUE = 1000;
+  var DEFAULT_ROOM_NUMBER_VALUE = '1';
+  var DEFAULT_CAPACITY_VALUE = '0';
+  var DEFAULT_TIME_VALUE = '12';
+
+  noticeFormTitle.value = DEFAULT_TITLE_VALUE;
+  noticeFormType.value = DEFAULT_TYPE_VALUE;
+  noticeFormPrice.value = DEFAULT_PRICE_VALUE;
+  noticeFormRoomNumber.value = DEFAULT_ROOM_NUMBER_VALUE;
+  noticeFormCapacity.value = DEFAULT_CAPACITY_VALUE;
+  noticeFormTime.value = DEFAULT_TIME_VALUE;
+  noticeFormTimeout.value = DEFAULT_TIME_VALUE;
+};
+
+// СИНХРОНИЗАЦИЯ ЗНАЧЕНИЯ
+var syncValue = function (syncedElement, changingElement, dictionary) {
+  syncedElement.value = dictionary[changingElement.value];
+};
+
+// ДОБАВЛЕНИЕ СИНХРОНИЗАЦИИ К ПОЛЯМ ФОРМЫ
+var addSyncToNoticeFormFields = function () {
+  var minPrices = {
+    'flat': 1000,
+    'shack': 0,
+    'palace': 10000
+  };
+
+  var roomsCapacity = {
+    '1': 0,
+    '2': 3,
+    '100': 3
+  };
+
+  var guestsCapacity = {
+    '0': 1,
+    '3': 2
+  };
+
+  var times = {
+    '12': 12,
+    '13': 13,
+    '14': 14
+  };
+
+  noticeFormType.addEventListener('change', function () {
+    syncValue(noticeFormPrice, noticeFormType, minPrices);
+    noticeFormPrice.setAttribute('min', minPrices[noticeFormType.value]);
+  });
+
+  noticeFormRoomNumber.addEventListener('change', function () {
+    syncValue(noticeFormCapacity, noticeFormRoomNumber, roomsCapacity);
+  });
+
+  noticeFormCapacity.addEventListener('change', function () {
+    syncValue(noticeFormRoomNumber, noticeFormCapacity, guestsCapacity);
+  });
+
+  noticeFormTime.addEventListener('change', function () {
+    syncValue(noticeFormTimeout, noticeFormTime, times);
+  });
+
+  noticeFormTimeout.addEventListener('change', function () {
+    syncValue(noticeFormTime, noticeFormTimeout, times);
+  });
+};
+
+// ДОБАВЛЕНИЕ КРАСНОЙ РАМКИ ДЛЯ НЕВАЛИДНОГО ПОЛЯ
+var addFormFieldInvalidStatus = function (invalidField) {
+  invalidField.classList.add('invalid');
+};
+
+// УДАЛЕНИЕ КРАСНОЙ РАМКИ СО ВСЕХ ПОЛЕЙ ФОРМЫ
+var removeFormFieldsInvalidStatus = function () {
+  var invalidFields = noticeForm.querySelectorAll('.invalid');
+
+  for (var i = 0; i < invalidFields.length; i++) {
+    invalidFields[i].classList.remove('invalid');
+  }
+};
+
+// ДОБАВЛЕНИЕ ВАЛИДАЦИИ ФОРМЫ NOTICE
+var addNoticeFormValidation = function () {
+  noticeForm.addEventListener('invalid', function (evt) {
+    evt.preventDefault();
+    addFormFieldInvalidStatus(evt.target);
+  }, true);
+
+  noticeForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    removeFormFieldsInvalidStatus();
+    fillNoticeFormDefaultValues();
+  });
+};
+
+// ДОБАВЛЕНИЕ ФУНКЦИОНАЛА К ФОРМЕ NOTICE
+var addFunctionalToNoticeForm = function () {
+  addValidityAttributesToNoticeForm();
+  fillNoticeFormDefaultValues();
+  addSyncToNoticeFormFields();
+
+  addNoticeFormValidation();
+};
+
 generateMap();
+addFunctionalToNoticeForm();
