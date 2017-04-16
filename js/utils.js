@@ -3,17 +3,17 @@
 window.utils = (function () {
 
   return {
-    // œŒÀ”◊≈Õ»≈ —À”◊¿…ÕŒ√Œ ◊»—À¿
+    // –ü–û–õ–£–ß–ï–ù–ò–ï –°–õ–£–ß–ê–ô–ù–û–ì–û –ß–ò–°–õ–ê
     getRandomIntNumber: function (min, max) {
       return Math.floor(Math.random() * (max + 1 - min) + min);
     },
 
-    // œ–Œ¬≈– ¿ Õ¿∆¿“»ﬂ ESC
+    // –ü–†–û–í–ï–†–ö–ê –ù–ê–ñ–ê–¢–ò–Ø –ù–ê ESC
     isEscPress: function (evt) {
       return evt.keyCode === 27;
     },
 
-    // œ–Œ¬≈– ¿ Õ¿∆¿“»ﬂ ENTER
+    // –ü–†–û–í–ï–†–ö–ê –ù–ê–ñ–ê–¢–ò–Ø –ù–ê ENTER
     isEnterPress: function (evt) {
       return evt.keyCode === 13;
     }

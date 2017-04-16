@@ -28,8 +28,8 @@ window.generateData = (function () {
     return avatarPathFull;
   };
 
-  // СОЗДАНИЕ ОБЪЯВЛЕНИЯ
-  var generatePin = function (number) {
+  // СОЗДАНИЕ ОБЪЕКТА НЕДВИЖИМОСТИ
+  var generateProperty = function (number) {
     var MIN_X = 300;
     var MAX_X = 900;
     var MIN_Y = 100;
@@ -49,7 +49,7 @@ window.generateData = (function () {
 
     var features = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 
-    var pin = {
+    var property = {
       'author': {
         'avatar': getAvatarPath(number)
       },
@@ -74,11 +74,11 @@ window.generateData = (function () {
       }
     };
 
-    return pin;
+    return property;
   };
 
-  // ПРИСВОЕНИЕ TITLE ДЛЯ ОБЪЯВЛЕНИЙ
-  var setPinTitles = function (pins) {
+  // ПРИСВОЕНИЕ TITLE ДЛЯ ОБЪЕКТА НЕДВИЖИМОСТИ
+  var setPropertiesTitles = function (properties) {
     var titles = [
       'Большая уютная квартира',
       'Маленькая неуютная квартира',
@@ -93,28 +93,24 @@ window.generateData = (function () {
 
     var randomIndex;
 
-    for (var i = 0; i < pins.length; i++) {
+    for (var i = 0; i < properties.length; i++) {
       randomIndex = window.utils.getRandomIntNumber(0, titles.length - 1);
       title = titles.splice(randomIndex, 1)[0];
-      pins[i].offer.title = title;
+      properties[i].offer.title = title;
     }
   };
 
-  return {
-    // СОЗДАНИЕ МАССИВА PIN'ОВ
-    generatePins: function () {
-      var pins = [];
-      var pinsCount = 8;
+  return function () {
+    var properties = [];
+    var propertiesCount = 8;
 
-      for (var i = 0; i < pinsCount; i++) {
-        pins.push(generatePin(i));
-      }
-
-      setPinTitles(pins);
-
-      return pins;
+    for (var i = 0; i < propertiesCount; i++) {
+      properties.push(generateProperty(i));
     }
 
+    setPropertiesTitles(properties);
+
+    return properties;
   };
 
 })();

@@ -16,7 +16,7 @@ window.generateMap = (function () {
   };
 
   var generateMap = function () {
-    var pins = window.generateData.generatePins();
+    var pins = window.generateData();
 
     addPinMarksOnPage(pins);
     window.initCard.closeDialog();
