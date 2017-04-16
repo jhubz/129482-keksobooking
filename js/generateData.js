@@ -1,21 +1,15 @@
 'use strict';
 
-window.data = (function () {
-
-  // ПОЛУЧЕНИЕ СЛУЧАЙНОГО ЦЕЛОГО ЧИСЛА ИЗ ЗАДАННОГО ДИАПАЗОНА
-  var getRandomIntNumber = function (min, max) {
-    return Math.floor(Math.random() * (max + 1 - min) + min);
-  };
-
+window.generateData = (function () {
   // ПОЛУЧЕНИЕ СЛУЧАЙНОЙ ВЫБОРКИ ИЗ МАССИВА
   var getRandomArray = function (array) {
     var randomArray = [];
     var randomIndex;
-    var randomArrayLength = getRandomIntNumber(0, array.length);
+    var randomArrayLength = window.utils.getRandomIntNumber(0, array.length);
     var randomArrayValue;
 
     for (var i = 0; i < randomArrayLength; i++) {
-      randomIndex = getRandomIntNumber(0, array.length - 1);
+      randomIndex = window.utils.getRandomIntNumber(0, array.length - 1);
       randomArrayValue = array.splice(randomIndex, 1)[0];
       randomArray.push(randomArrayValue);
     }
@@ -40,8 +34,8 @@ window.data = (function () {
     var MAX_X = 900;
     var MIN_Y = 100;
     var MAX_Y = 500;
-    var locationX = getRandomIntNumber(MIN_X, MAX_X);
-    var locationY = getRandomIntNumber(MIN_Y, MAX_Y);
+    var locationX = window.utils.getRandomIntNumber(MIN_X, MAX_X);
+    var locationY = window.utils.getRandomIntNumber(MIN_Y, MAX_Y);
 
     var MIN_PRICE = 1000;
     var MAX_PRICE = 1000000;
@@ -63,12 +57,12 @@ window.data = (function () {
       'offer': {
         'title': '',
         'address': locationX + ', ' + locationY,
-        'price': getRandomIntNumber(MIN_PRICE, MAX_PRICE),
-        'type': types[getRandomIntNumber(0, types.length - 1)],
-        'rooms': getRandomIntNumber(MIN_ROOMS, MAX_ROOMS),
-        'guests': getRandomIntNumber(1, 30),
-        'checkin': times[getRandomIntNumber(0, times.length - 1)],
-        'checkout': times[getRandomIntNumber(0, times.length - 1)],
+        'price': window.utils.getRandomIntNumber(MIN_PRICE, MAX_PRICE),
+        'type': types[window.utils.getRandomIntNumber(0, types.length - 1)],
+        'rooms': window.utils.getRandomIntNumber(MIN_ROOMS, MAX_ROOMS),
+        'guests': window.utils.getRandomIntNumber(1, 30),
+        'checkin': times[window.utils.getRandomIntNumber(0, times.length - 1)],
+        'checkout': times[window.utils.getRandomIntNumber(0, times.length - 1)],
         'features': getRandomArray(features),
         'description': '',
         'photos': ''
@@ -100,26 +94,27 @@ window.data = (function () {
     var randomIndex;
 
     for (var i = 0; i < pins.length; i++) {
-      randomIndex = getRandomIntNumber(0, titles.length - 1);
+      randomIndex = window.utils.getRandomIntNumber(0, titles.length - 1);
       title = titles.splice(randomIndex, 1)[0];
       pins[i].offer.title = title;
     }
   };
 
   return {
-    generatePins:
-      function () {
-        var pins = [];
-        var pinsCount = 8;
+    // СОЗДАНИЕ МАССИВА PIN'ОВ
+    generatePins: function () {
+      var pins = [];
+      var pinsCount = 8;
 
-        for (var i = 0; i < pinsCount; i++) {
-          pins.push(generatePin(i));
-        }
-
-        setPinTitles(pins);
-
-        return pins;
+      for (var i = 0; i < pinsCount; i++) {
+        pins.push(generatePin(i));
       }
+
+      setPinTitles(pins);
+
+      return pins;
+    }
+
   };
 
 })();

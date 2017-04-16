@@ -1,9 +1,6 @@
 'use strict';
 
-window.card = (function () {
-  var windowMap = window.map;
-  var windowPin = window.pin;
-
+window.initCard = (function () {
   var dialog = document.querySelector('.dialog');
   var dialogCloseButton = dialog.querySelector('.dialog__close');
 
@@ -82,8 +79,8 @@ window.card = (function () {
 
   // ЗАКРЫТИЕ ДИАЛОГА ПРИ НАЖАТИИ ESC
   var onDialogEscPress = function (evt) {
-    if (windowMap.isEscPress(evt)) {
-      windowPin.unActivateSelectedPin();
+    if (window.utils.isEscPress(evt)) {
+      window.generatePin.unActivateSelectedPin();
       closeDialog(evt);
     }
   };
@@ -91,7 +88,7 @@ window.card = (function () {
   // ЗАКРЫТИЕ ДИАЛОГА ПРИ КЛИКЕ НА КНОПКЕ ЗАКРЫТИЯ ДИАЛОГА
   var onDialogCloseClick = function (evt) {
     evt.preventDefault();
-    windowPin.unActivateSelectedPin();
+    window.generatePin.unActivateSelectedPin();
     closeDialog(evt);
   };
 

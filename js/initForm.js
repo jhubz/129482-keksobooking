@@ -1,6 +1,6 @@
 'use strict';
 
-window.form = (function () {
+window.initForm = (function () {
   var noticeForm = document.querySelector('.notice__form');
 
   var noticeFormTitle = noticeForm.querySelector('#title');
@@ -121,15 +121,14 @@ window.form = (function () {
     });
   };
 
-  return {
-    addFunctionalToNoticeForm:
-      (function () {
-        addValidityAttributesToNoticeForm();
-        fillNoticeFormDefaultValues();
-        addSyncToNoticeFormFields();
+  var addFunctionalToNoticeForm = function () {
+    addValidityAttributesToNoticeForm();
+    fillNoticeFormDefaultValues();
+    addSyncToNoticeFormFields();
 
-        addNoticeFormValidation();
-      })()
+    addNoticeFormValidation();
   };
+
+  addFunctionalToNoticeForm();
 
 })();
