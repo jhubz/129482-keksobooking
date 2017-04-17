@@ -31,6 +31,20 @@ window.generateMap = (function () {
       y: evt.pageY
     };
 
+    // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ СМЕЩЕНИЯ ОБЪЕКТА, УЧИТЫВАЯ ГРАНИЦЫ
+    var getElementOffset = function (elementOffset, shift, borderValueMin, borderValueMax, elementDimension) {
+      var offset;
+      if ((elementOffset - shift) < (borderValueMin - elementDimension)) {
+        offset = borderValueMin - elementDimension;
+      } else if ((elementOffset - shift) > (borderValueMax - elementDimension)) {
+        offset = borderValueMax - elementDimension;
+      } else {
+        offset = elementOffset - shift;
+      }
+      return offset;
+    };
+
+    // ОБРАБОТЧИК mousemove ПРИ ПЕРЕТАСКИВАНИИ pin-main
     var onPinMainMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
 
@@ -44,8 +58,8 @@ window.generateMap = (function () {
         y: moveEvt.pageY
       };
 
-      pinMainLeft = pinMain.offsetLeft - shift.x;
-      pinMainTop = pinMain.offsetTop - shift.y;
+      pinMainLeft = getElementOffset(pinMain.offsetLeft, shift.x, window.variables.MIN_X, window.variables.MAX_X, pinMainWidth / 2);
+      pinMainTop = getElementOffset(pinMain.offsetTop, shift.y, window.variables.MIN_Y, window.variables.MAX_Y, pinMainHeigth);
 
       pinMain.style.left = pinMainLeft + 'px';
       pinMain.style.top = pinMainTop + 'px';
@@ -53,6 +67,7 @@ window.generateMap = (function () {
       window.initForm(pinMainLeft + pinMainWidth / 2, pinMainTop + pinMainHeigth);
     };
 
+    // ОБРАБОТЧИК mouseup ПРИ ЗАВЕРШЕНИИ ПЕРЕТАСКИВАНИЯ pin-main
     var onPinMainMouseUp = function (upEvt) {
       upEvt.preventDefault();
 

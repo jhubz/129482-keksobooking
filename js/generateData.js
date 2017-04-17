@@ -30,12 +30,8 @@ window.generateData = (function () {
 
   // СОЗДАНИЕ ОБЪЕКТА НЕДВИЖИМОСТИ
   var generateProperty = function (number) {
-    var MIN_X = 300;
-    var MAX_X = 900;
-    var MIN_Y = 100;
-    var MAX_Y = 500;
-    var locationX = window.utils.getRandomIntNumber(MIN_X, MAX_X);
-    var locationY = window.utils.getRandomIntNumber(MIN_Y, MAX_Y);
+    var locationX = window.utils.getRandomIntNumber(window.variables.MIN_X, window.variables.MAX_X);
+    var locationY = window.utils.getRandomIntNumber(window.variables.MIN_Y, window.variables.MAX_Y);
 
     var MIN_PRICE = 1000;
     var MAX_PRICE = 1000000;

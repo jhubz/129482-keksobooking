@@ -124,14 +124,31 @@ window.initForm = (function () {
 
   // ПОЛУЧЕНИЕ ЧИСЛА ИЗ СТРОКИ
   var getNumberFromString = function (string) {
-    return +string.match(/\d+\.\d+/g) || +string.match(/\d+/g);
+    return +string.match(/\d+\.\d+/) || +string.match(/\d+/);
+  };
+
+  // ПОЛУЧЕНИЕ ЧИСЛА, КОТОРОЕ НЕ ВЫХОДИТ ЗА ПРЕДЕЛЫ ДИАПАЗОНА
+  var getNumberInRange = function (number, min, max) {
+    if (number < min) {
+      number = min;
+    } else if (number > max) {
+      number = max;
+    }
+
+    return number;
+  };
+
+  var setAddress = function (left, top) {
+    address.value = 'x: ' + left + ', y: ' + top;
   };
 
   // ДОБАВЛЕНИЕ СЛУШАТЕЛЯ К ПОЛЮ ADDRESS
   address.addEventListener('change', function () {
     var coords = address.value.split(', ');
-    window.generateMap(getNumberFromString(coords[0]), getNumberFromString(coords[1]));
-
+    var left = getNumberInRange(getNumberFromString(coords[0]), window.variables.MIN_X, window.variables.MAX_X);
+    var top = getNumberInRange(getNumberFromString(coords[1]), window.variables.MIN_Y, window.variables.MAX_Y);
+    setAddress(left, top);
+    window.generateMap(left, top);
   });
 
   // ДОБАВЛЕНИЕ ФУНКЦИОНАЛА К ФОРМЫ NOTICE
@@ -145,8 +162,6 @@ window.initForm = (function () {
 
   addFunctionalToNoticeForm();
 
-  return function (left, top) {
-    address.value = 'x: ' + left + ', y: ' + top;
-  };
+  return setAddress;
 
 })();
