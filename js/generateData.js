@@ -34,6 +34,7 @@ window.generateData = (function () {
     var MAX_X = 900;
     var MIN_Y = 100;
     var MAX_Y = 500;
+
     var locationX = window.utils.getRandomIntNumber(MIN_X, MAX_X);
     var locationY = window.utils.getRandomIntNumber(MIN_Y, MAX_Y);
 

@@ -8,6 +8,7 @@ window.initForm = (function () {
   var noticeFormPrice = noticeForm.querySelector('#price');
   var noticeFormRoomNumber = noticeForm.querySelector('#room_number');
   var noticeFormCapacity = noticeForm.querySelector('#capacity');
+  var address = noticeForm.querySelector('#address');
   var noticeFormTime = noticeForm.querySelector('#time');
   var noticeFormTimeout = noticeForm.querySelector('#timeout');
 
@@ -121,6 +122,24 @@ window.initForm = (function () {
     });
   };
 
+  // ПОЛУЧЕНИЕ ЧИСЛА ИЗ СТРОКИ
+  var getNumberFromString = function (string) {
+    return +string.match(/\d+\.\d+/) || +string.match(/\d+/);
+  };
+
+  var setAddress = function (left, top) {
+    address.value = 'x: ' + left + ', y: ' + top;
+  };
+
+  // ДОБАВЛЕНИЕ СЛУШАТЕЛЯ К ПОЛЮ ADDRESS
+  address.addEventListener('change', function () {
+    var coords = address.value.split(', ');
+    var resultCoords = window.generateMap.getElementOffsets(getNumberFromString(coords[0]), getNumberFromString(coords[1]));
+    setAddress(resultCoords[0], resultCoords[1]);
+    window.generateMap.setPinMainOffset(resultCoords[0], resultCoords[1]);
+  });
+
+  // ДОБАВЛЕНИЕ ФУНКЦИОНАЛА К ФОРМЫ NOTICE
   var addFunctionalToNoticeForm = function () {
     addValidityAttributesToNoticeForm();
     fillNoticeFormDefaultValues();
@@ -130,5 +149,7 @@ window.initForm = (function () {
   };
 
   addFunctionalToNoticeForm();
+
+  return setAddress;
 
 })();

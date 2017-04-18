@@ -25,7 +25,7 @@ window.generatePin = (function () {
     window.initCard.openDialog(evt);
   };
 
-  // ДОБАВЛЕНИЕ СЛУШАТЕЛЯ К PIN
+  // ДОБАВЛЕНИЕ СЛУШАТЕЛЕЙ К PIN
   var addListenerToPinMark = function (pinMark, pin) {
     pinMark.addEventListener('click', function (evt) {
       onPinClick(evt, pin);
