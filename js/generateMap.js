@@ -1,16 +1,22 @@
 'use strict';
 
 window.generateMap = (function () {
-  var MIN_X = 300;
-  var MAX_X = 900;
-  var MIN_Y = 100;
-  var MAX_Y = 500;
 
-  var pinMap = document.querySelector('.tokyo__pin-map');
+  var tokyo = document.querySelector('.tokyo');
+  var mapWidth = tokyo.offsetWidth;
+  var mapHeight = tokyo.offsetHeight;
+  var filtersHeight = 46;
+
+  var pinMap = tokyo.querySelector('.tokyo__pin-map');
 
   var pinMain = pinMap.querySelector('.pin__main');
   var pinMainWidth = 75;
   var pinMainHeigth = 94;
+
+  var MIN_X = 0;
+  var MAX_X = mapWidth;
+  var MIN_Y = pinMainHeigth;
+  var MAX_Y = mapHeight - filtersHeight;
 
   // ДОБАВЛЕНИЕ РАЗМЕТКИ PIN НА КАРТУ
   var addPinMarkOnMap = function (pin) {
@@ -24,6 +30,23 @@ window.generateMap = (function () {
     }
   };
 
+  // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ СМЕЩЕНИЯ ОБЪЕКТА, УЧИТЫВАЯ ГРАНИЦЫ
+  var getElementOffsets = function (elementOffsetsX, elementOffsetsY) {
+    if (elementOffsetsX < MIN_X) {
+      elementOffsetsX = MIN_X;
+    } else if (elementOffsetsX > MAX_X) {
+      elementOffsetsX = MAX_X;
+    }
+
+    if (elementOffsetsY < MIN_Y) {
+      elementOffsetsY = MIN_Y;
+    } else if (elementOffsetsY > MAX_Y) {
+      elementOffsetsY = MAX_Y;
+    }
+
+    return [elementOffsetsX, elementOffsetsY];
+  };
+
   // ДОБАВЛЕНИЕ ПЕРЕДВИЖЕНИЯ К ГЛАВНОМУ PIN'У
   pinMain.addEventListener('mousedown', function (evt) {
     evt.preventDefault();
@@ -33,37 +56,27 @@ window.generateMap = (function () {
       y: evt.pageY
     };
 
-    // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ СМЕЩЕНИЯ ОБЪЕКТА, УЧИТЫВАЯ ГРАНИЦЫ
-    var getElementOffsets = function (elementOffsets, minCoords, maxCoords) {
-      for (var i = 0; i < elementOffsets.length; i++) {
-        if (elementOffsets[i] < minCoords[i]) {
-          elementOffsets[i] = minCoords[i];
-        } else if (elementOffsets[i] > maxCoords[i]) {
-          elementOffsets[i] = maxCoords[i];
-        }
-      }
-
-      return elementOffsets;
-    };
-
     // ОБРАБОТЧИК mousemove ПРИ ПЕРЕТАСКИВАНИИ pin-main
     var onPinMainMouseMove = function (moveEvt) {
       moveEvt.preventDefault();
-
-      var pinMainOffsets = getElementOffsets([pinMain.offsetLeft + pinMainWidth / 2, pinMain.offsetTop + pinMainHeigth], [MIN_X, MIN_Y], [MAX_X, MAX_Y]);
 
       var shift = {
         x: startCoords.x - moveEvt.pageX,
         y: startCoords.y - moveEvt.pageY
       };
 
+      var mainPinLeft = pinMain.offsetLeft - shift.x + pinMainWidth / 2;
+      var mainPinTop = pinMain.offsetTop - shift.y + pinMainHeigth;
+
+      var pinMainOffsets = getElementOffsets(mainPinLeft, mainPinTop);
+
       startCoords = {
         x: moveEvt.pageX,
         y: moveEvt.pageY
       };
 
-      pinMain.style.left = pinMainOffsets[0] - shift.x - (pinMainWidth / 2) + 'px';
-      pinMain.style.top = pinMainOffsets[1] - shift.y - pinMainHeigth + 'px';
+      pinMain.style.left = pinMainOffsets[0] - (pinMainWidth / 2) + 'px';
+      pinMain.style.top = pinMainOffsets[1] - pinMainHeigth + 'px';
 
       window.initForm(pinMainOffsets[0], pinMainOffsets[1]);
     };
@@ -98,21 +111,7 @@ window.generateMap = (function () {
       pinMain.style.top = pinMainTop - pinMainHeigth + 'px';
     },
 
-    getCoordsInRange: function (numberX, numberY) {
-      if (numberX < MIN_X) {
-        numberX = MIN_X;
-      } else if (numberX > MAX_X) {
-        numberX = MAX_X;
-      }
-
-      if (numberY < MIN_Y) {
-        numberY = MIN_Y;
-      } else if (numberY > MAX_Y) {
-        numberY = MAX_Y;
-      }
-
-      return [numberX, numberY];
-    }
+    getElementOffsets: getElementOffsets
 
   };
 

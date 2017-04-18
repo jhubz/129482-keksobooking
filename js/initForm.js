@@ -134,7 +134,7 @@ window.initForm = (function () {
   // ДОБАВЛЕНИЕ СЛУШАТЕЛЯ К ПОЛЮ ADDRESS
   address.addEventListener('change', function () {
     var coords = address.value.split(', ');
-    var resultCoords = window.generateMap.getCoordsInRange(getNumberFromString(coords[0]), getNumberFromString(coords[1]));
+    var resultCoords = window.generateMap.getElementOffsets(getNumberFromString(coords[0]), getNumberFromString(coords[1]));
     setAddress(resultCoords[0], resultCoords[1]);
     window.generateMap.setPinMainOffset(resultCoords[0], resultCoords[1]);
   });
