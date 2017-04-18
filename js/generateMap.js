@@ -1,22 +1,16 @@
 'use strict';
 
 window.generateMap = (function () {
-
   var tokyo = document.querySelector('.tokyo');
-  var mapWidth = tokyo.offsetWidth;
-  var mapHeight = tokyo.offsetHeight;
-  var filtersHeight = 46;
-
   var pinMap = tokyo.querySelector('.tokyo__pin-map');
-
   var pinMain = pinMap.querySelector('.pin__main');
   var pinMainWidth = 75;
-  var pinMainHeigth = 94;
+  var filtersHeight = 46;
 
   var MIN_X = 0;
-  var MAX_X = mapWidth;
-  var MIN_Y = pinMainHeigth;
-  var MAX_Y = mapHeight - filtersHeight;
+  var MAX_X = tokyo.offsetWidth;
+  var MIN_Y = 94;
+  var MAX_Y = tokyo.offsetHeight - filtersHeight;
 
   // ДОБАВЛЕНИЕ РАЗМЕТКИ PIN НА КАРТУ
   var addPinMarkOnMap = function (pin) {
@@ -66,7 +60,7 @@ window.generateMap = (function () {
       };
 
       var mainPinLeft = pinMain.offsetLeft - shift.x + pinMainWidth / 2;
-      var mainPinTop = pinMain.offsetTop - shift.y + pinMainHeigth;
+      var mainPinTop = pinMain.offsetTop - shift.y + MIN_Y;
 
       var pinMainOffsets = getElementOffsets(mainPinLeft, mainPinTop);
 
@@ -76,7 +70,7 @@ window.generateMap = (function () {
       };
 
       pinMain.style.left = pinMainOffsets[0] - (pinMainWidth / 2) + 'px';
-      pinMain.style.top = pinMainOffsets[1] - pinMainHeigth + 'px';
+      pinMain.style.top = pinMainOffsets[1] - MIN_Y + 'px';
 
       window.initForm(pinMainOffsets[0], pinMainOffsets[1]);
     };
@@ -98,7 +92,7 @@ window.generateMap = (function () {
   var generateMap = function () {
     var pins = window.generateData();
 
-    window.initForm(pinMain.offsetLeft + pinMainWidth / 2, pinMain.offsetTop + pinMainHeigth);
+    window.initForm(pinMain.offsetLeft + pinMainWidth / 2, pinMain.offsetTop + MIN_Y);
     addPinMarksOnPage(pins);
     window.initCard.closeDialog();
   };
@@ -108,7 +102,7 @@ window.generateMap = (function () {
   return {
     setPinMainOffset: function (pinMainLeft, pinMainTop) {
       pinMain.style.left = pinMainLeft - pinMainWidth / 2 + 'px';
-      pinMain.style.top = pinMainTop - pinMainHeigth + 'px';
+      pinMain.style.top = pinMainTop - MIN_Y + 'px';
     },
 
     getElementOffsets: getElementOffsets
