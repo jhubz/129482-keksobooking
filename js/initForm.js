@@ -64,26 +64,11 @@ window.initForm = (function () {
       element.setAttribute('min', value);
     };
 
-    noticeFormType.addEventListener('change', function () {
-      window.synchronizeFields(noticeFormType, noticeFormPrice, types, minPrices, setMinValueToElement);
-    });
-
-    noticeFormRoomNumber.addEventListener('change', function () {
-      window.synchronizeFields(noticeFormRoomNumber, noticeFormCapacity, rooms, guests, setValueToElement);
-    });
-
-    noticeFormCapacity.addEventListener('change', function () {
-      window.synchronizeFields(noticeFormCapacity, noticeFormRoomNumber, reverseGuests, reverseRooms, setValueToElement);
-    });
-
-    noticeFormTime.addEventListener('change', function () {
-      window.synchronizeFields(noticeFormTime, noticeFormTimeout, times, times, setValueToElement);
-    });
-
-    noticeFormTimeout.addEventListener('change', function () {
-      window.synchronizeFields(noticeFormTimeout, noticeFormTime, times, times, setValueToElement);
-    });
-
+    window.synchronizeFields(noticeFormType, noticeFormPrice, types, minPrices, setMinValueToElement);
+    window.synchronizeFields(noticeFormRoomNumber, noticeFormCapacity, rooms, guests, setValueToElement);
+    window.synchronizeFields(noticeFormCapacity, noticeFormRoomNumber, reverseGuests, reverseRooms, setValueToElement);
+    window.synchronizeFields(noticeFormTime, noticeFormTimeout, times, times, setValueToElement);
+    window.synchronizeFields(noticeFormTimeout, noticeFormTime, times, times, setValueToElement);
   };
 
   // ДОБАВЛЕНИЕ КРАСНОЙ РАМКИ ДЛЯ НЕВАЛИДНОГО ПОЛЯ
