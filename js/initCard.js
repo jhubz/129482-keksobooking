@@ -112,8 +112,12 @@ window.initCard = (function () {
 
   return {
     closeDialog: closeDialog,
-    openDialog: openDialog,
-    fillDialogFields: fillDialogFields
+
+    showDialog: function (evt, pin) {
+      fillDialogFields(pin);
+      openDialog(evt);
+    }
+
   };
 
 })();

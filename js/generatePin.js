@@ -21,8 +21,7 @@ window.generatePin = (function () {
   var onPinClick = function (evt, pin) {
     unActivateSelectedPin();
     activatePin(evt.currentTarget);
-    window.initCard.fillDialogFields(pin);
-    window.initCard.openDialog(evt);
+    window.initCard.showDialog(evt, pin);
   };
 
   // ДОБАВЛЕНИЕ СЛУШАТЕЛЕЙ К PIN
