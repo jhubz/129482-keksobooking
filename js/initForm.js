@@ -42,56 +42,48 @@ window.initForm = (function () {
     noticeFormTimeout.value = DEFAULT_TIME_VALUE;
   };
 
-  // СИНХРОНИЗАЦИЯ ЗНАЧЕНИЯ
-  var syncValue = function (syncedElement, changingElement, dictionary) {
-    syncedElement.value = dictionary[changingElement.value];
-  };
-
   // ДОБАВЛЕНИЕ СИНХРОНИЗАЦИИ К ПОЛЯМ ФОРМЫ
   var addSyncToNoticeFormFields = function () {
-    var minPrices = {
-      'flat': 1000,
-      'shack': 0,
-      'palace': 10000
+    var types = ['flat', 'shack', 'palace'];
+    var minPrices = ['1000', '0', '10000'];
+
+    var rooms = ['1', '2', '100'];
+    var guests = ['0', '3', '3'];
+
+    var reverseGuests = ['3', '0'];
+    var reverseRooms = ['2', '1'];
+
+    var times = ['12', '13', '14'];
+
+    var setValueToElement = function (element, value) {
+      element.value = value;
     };
 
-    var roomsCapacity = {
-      '1': 0,
-      '2': 3,
-      '100': 3
-    };
-
-    var guestsCapacity = {
-      '0': 1,
-      '3': 2
-    };
-
-    var times = {
-      '12': 12,
-      '13': 13,
-      '14': 14
+    var setMinValueToElement = function (element, value) {
+      element.value = value;
+      element.setAttribute('min', value);
     };
 
     noticeFormType.addEventListener('change', function () {
-      syncValue(noticeFormPrice, noticeFormType, minPrices);
-      noticeFormPrice.setAttribute('min', minPrices[noticeFormType.value]);
+      window.synchronizeFields(noticeFormType, noticeFormPrice, types, minPrices, setMinValueToElement);
     });
 
     noticeFormRoomNumber.addEventListener('change', function () {
-      syncValue(noticeFormCapacity, noticeFormRoomNumber, roomsCapacity);
+      window.synchronizeFields(noticeFormRoomNumber, noticeFormCapacity, rooms, guests, setValueToElement);
     });
 
     noticeFormCapacity.addEventListener('change', function () {
-      syncValue(noticeFormRoomNumber, noticeFormCapacity, guestsCapacity);
+      window.synchronizeFields(noticeFormCapacity, noticeFormRoomNumber, reverseGuests, reverseRooms, setValueToElement);
     });
 
     noticeFormTime.addEventListener('change', function () {
-      syncValue(noticeFormTimeout, noticeFormTime, times);
+      window.synchronizeFields(noticeFormTime, noticeFormTimeout, times, times, setValueToElement);
     });
 
     noticeFormTimeout.addEventListener('change', function () {
-      syncValue(noticeFormTime, noticeFormTimeout, times);
+      window.synchronizeFields(noticeFormTimeout, noticeFormTime, times, times, setValueToElement);
     });
+
   };
 
   // ДОБАВЛЕНИЕ КРАСНОЙ РАМКИ ДЛЯ НЕВАЛИДНОГО ПОЛЯ
