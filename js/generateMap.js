@@ -12,16 +12,11 @@ window.generateMap = (function () {
   var MIN_Y = 94;
   var MAX_Y = tokyo.offsetHeight - filtersHeight;
 
+  var DATA_URL = 'https://intensive-javascript-server-kjgvxfepjl.now.sh/keksobooking/data';
+
   // ДОБАВЛЕНИЕ РАЗМЕТКИ PIN НА КАРТУ
   var addPinMarkOnMap = function (pin) {
     pinMap.appendChild(window.generatePin.createPinMark(pin));
-  };
-
-  // ДОБАВЛЕНИЕ МАССИВА РАЗМЕТОК PIN НА КАРТУ
-  var addPinMarksOnPage = function (pins) {
-    for (var i = 0; i < pins.length; i++) {
-      addPinMarkOnMap(pins[i]);
-    }
   };
 
   // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ СМЕЩЕНИЯ ОБЪЕКТА, УЧИТЫВАЯ ГРАНИЦЫ
@@ -88,16 +83,31 @@ window.generateMap = (function () {
 
   });
 
-  // ГЕНЕРАЦИЯ КАРТЫ
-  var generateMap = function () {
-    var pins = window.generateData();
-
-    window.initForm(pinMain.offsetLeft + pinMainWidth / 2, pinMain.offsetTop + MIN_Y);
-    addPinMarksOnPage(pins);
-    window.initCard.closeDialog();
+  // ДОБАВЛЕНИЕ МАССИВА РАЗМЕТОК PIN НА КАРТУ
+  var onLoad = function (data) {
+    for (var i = 0; i < data.length; i++) {
+      addPinMarkOnMap(data[i]);
+    }
   };
 
-  generateMap();
+  // ДОБАВЛЕНИЕ РАЗМЕТКИ ОШИБКИ НА СТРАНИЦУ
+  var onError = function (errorMessage) {
+    var errorMarkTemplate = document.querySelector('#error-template');
+    var errorMarkElement = errorMarkTemplate.content.cloneNode(true);
+
+    var errorMessageDiv = errorMarkElement.querySelector('.error-message');
+    errorMessageDiv.textContent = errorMessage;
+
+    tokyo.appendChild(errorMarkElement);
+  };
+
+  var initMap = function () {
+    window.initCard.closeDialog();
+    window.load(DATA_URL, onLoad, onError);
+    window.initForm(pinMain.offsetLeft + pinMainWidth / 2, pinMain.offsetTop + MIN_Y);
+  };
+
+  initMap();
 
   return {
     setPinMainOffset: function (pinMainLeft, pinMainTop) {
