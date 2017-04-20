@@ -14,6 +14,7 @@ window.initCard = (function () {
   var checkinOut = dialog.querySelector('.lodge__checkin-time');
   var features = dialog.querySelector('.lodge__features');
   var description = dialog.querySelector('.lodge__description');
+  var photos = dialog.querySelector('.lodge__photos');
 
   // СКРЫВАНИЕ ЭЛЕМЕНТА
   var hideElement = function (element) {
@@ -47,6 +48,24 @@ window.initCard = (function () {
     return fragment;
   };
 
+  var createPinPhotosMark = function (pinPhotosArray) {
+    var photosElement;
+    var fragment = document.createDocumentFragment();
+
+    for (var i = 0; i < pinPhotosArray.length; i++) {
+      photosElement = document.createElement('img');
+
+      photosElement.setAttribute('src', pinPhotosArray[i]);
+      photosElement.setAttribute('alt', 'Lodge photo');
+      photosElement.setAttribute('width', '52');
+      photosElement.setAttribute('height', '42');
+
+      fragment.appendChild(photosElement);
+    }
+
+    return fragment;
+  };
+
   // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ ТИПА СДАВАЕМОГО ОБЪЕКТА
   var getOfferTypeValue = function (pin) {
     var offerTypes = {
@@ -75,6 +94,9 @@ window.initCard = (function () {
     features.appendChild(createPinFeaturesMark(pin.offer.features));
 
     description.textContent = pin.offer.description;
+
+    removeAllChild(photos);
+    photos.appendChild(createPinPhotosMark(pin.offer.photos));
   };
 
   // ЗАКРЫТИЕ ДИАЛОГА ПРИ НАЖАТИИ ESC
