@@ -81,11 +81,11 @@
       var getFeaturesMatchingRank = function (pin) {
         var featuresRank = featuresInputs.length;
 
-        for (var i = 0; i < featuresInputs.length; i++) {
-          if (featuresInputs[i].checked === true && !isPinContainsFeature(pin, featuresInputs[i].value)) {
+        featuresInputs.forEach(function (featuresInput) {
+          if (featuresInput.checked === true && !isPinContainsFeature(pin, featuresInput.value)) {
             featuresRank--;
           }
-        }
+        });
 
         return featuresRank;
       };
