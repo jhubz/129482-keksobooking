@@ -12,8 +12,6 @@ window.generateMap = (function () {
   var MIN_Y = 94;
   var MAX_Y = tokyo.offsetHeight - filtersHeight;
 
-  var DATA_URL = 'https://intensive-javascript-server-kjgvxfepjl.now.sh/keksobooking/data';
-
   // ДОБАВЛЕНИЕ РАЗМЕТКИ PIN НА КАРТУ
   var addPinMarkOnMap = function (pin) {
     pinMap.appendChild(window.generatePin.createPinMark(pin));
@@ -83,27 +81,9 @@ window.generateMap = (function () {
 
   });
 
-  // ДОБАВЛЕНИЕ МАССИВА РАЗМЕТОК PIN НА КАРТУ
-  var onLoad = function (data) {
-    for (var i = 0; i < data.length; i++) {
-      addPinMarkOnMap(data[i]);
-    }
-  };
-
-  // ДОБАВЛЕНИЕ РАЗМЕТКИ ОШИБКИ НА СТРАНИЦУ
-  var onError = function (errorMessage) {
-    var errorMarkTemplate = document.querySelector('#error-template');
-    var errorMarkElement = errorMarkTemplate.content.cloneNode(true);
-
-    var errorMessageDiv = errorMarkElement.querySelector('.error-message');
-    errorMessageDiv.textContent = errorMessage;
-
-    tokyo.appendChild(errorMarkElement);
-  };
-
   var initMap = function () {
     window.initCard.closeDialog();
-    window.load(DATA_URL, onLoad, onError);
+    window.setMapFilters();
     window.initForm(pinMain.offsetLeft + pinMainWidth / 2, pinMain.offsetTop + MIN_Y);
   };
 
@@ -113,6 +93,27 @@ window.generateMap = (function () {
     setPinMainOffset: function (pinMainLeft, pinMainTop) {
       pinMain.style.left = pinMainLeft - pinMainWidth / 2 + 'px';
       pinMain.style.top = pinMainTop - MIN_Y + 'px';
+    },
+
+    showErrorMessage: function (errorMessage) {
+      var errorMarkTemplate = document.querySelector('#error-template');
+      var errorMarkElement = errorMarkTemplate.content.cloneNode(true);
+
+      var errorMessageDiv = errorMarkElement.querySelector('.error-message');
+      errorMessageDiv.textContent = errorMessage;
+
+      tokyo.appendChild(errorMarkElement);
+    },
+
+    addPinMarksOnMap: function (pins) {
+      for (var i = pinMap.children.length - 1; i > 0; i--) {
+        pinMap.children[i].remove();
+      }
+
+      for (i = 0; i < pins.length; i++) {
+        addPinMarkOnMap(pins[i]);
+      }
+
     },
 
     getElementOffsets: getElementOffsets
