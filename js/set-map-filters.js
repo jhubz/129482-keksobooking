@@ -1,74 +1,75 @@
 'use strict';
 
 (function () {
-  window.setMapFilters = function () {
-    var DATA_URL = 'https://intensive-javascript-server-kjgvxfepjl.now.sh/keksobooking/data';
-
-    var pins = [];
+  window.setMapFilters = function (data) {
 
     var tokyoFiltersContainer = document.querySelector('.tokyo__filters');
-    var tokyoFilters = Array.from(tokyoFiltersContainer.querySelectorAll('.tokyo__filter')).map(function (it) {
-      return it;
+    var tokyoFilters = Array.from(tokyoFiltersContainer.querySelectorAll('.tokyo__filter')).map(function (arrElem) {
+      return arrElem;
     });
 
     var featuresContainer = tokyoFiltersContainer.querySelector('.tokyo__filter-set');
-    var featuresInputs = Array.from(featuresContainer.querySelectorAll('input')).map(function (it) {
-      return it;
+    var featuresInputs = Array.from(featuresContainer.querySelectorAll('input')).map(function (arrElem) {
+      return arrElem;
     });
 
-    // ОБНОВЛЕНИЕ pin
+    // ОБНОВЛЕНИЕ pins
     var updatePins = function () {
 
-      var isMatching = function (pin) {
+      // ПРОВЕРКА СОВПАДЕНИЯ ПОЛЯ pin С ПОЛЕМ ФИЛЬТРА
+      var isFieldMatchFilter = function (pinField, filter) {
+        return pinField.toString() === filter.value.toString() ||
+          filter.value.toString() === 'any';
+      };
 
-        var rank = 0;
-        var matchingRank = 10;
+      // ПРОВЕРКА СОВПАДЕНИЯ ПО type
+      var matchType = function (pin) {
+        return isFieldMatchFilter(pin.offer.type, tokyoFilters[0]);
+      };
 
-        if (pin.offer.type === tokyoFilters[0].value || tokyoFilters[0].value === 'any') {
-          rank++;
-        }
+      // ПРОВЕРКА СОВПАДЕНИЯ ПО price
+      var matchPrice = function (pin) {
+        var prices = {
+          low: {
+            min: 0,
+            max: 10000
+          },
 
-        if (isMatchingPrice(pin)) {
-          rank++;
-        }
+          middle: {
+            min: 10000,
+            max: 50000
+          },
 
-        if (pin.offer.rooms === +tokyoFilters[2].value || tokyoFilters[2].value === 'any') {
-          rank++;
-        }
+          high: {
+            min: 50000,
+            max: 9999999999
+          }
 
-        if (pin.offer.guests === +tokyoFilters[3].value || tokyoFilters[3].value === 'any') {
-          rank++;
-        }
+        };
 
-        rank += getFeaturesMatchingRank(pin, rank);
+        var getSelectedValue = function () {
+          return tokyoFilters[1].options[tokyoFilters[1].selectedIndex].value;
+        };
 
-        if (rank === matchingRank) {
+        if (pin.offer.price >= prices[getSelectedValue()].min && pin.offer.price <= prices[getSelectedValue()].max) {
           return true;
         }
 
         return false;
+
       };
 
-      // ПРОВЕРКА СОВПАДЕНИЯ ЦЕНЫ
-      var isMatchingPrice = function (pin) {
-        var low = 10000;
-        var high = 50000;
-
-        if (tokyoFilters[1].value === 'low' && pin.offer.price <= low) {
-          return true;
-        }
-
-        if (tokyoFilters[1].value === 'middle' && pin.offer.price >= low && pin.offer.price <= high) {
-          return true;
-        }
-
-        if (tokyoFilters[1].value === 'high' && pin.offer.price >= high) {
-          return true;
-        }
-
-        return false;
+      // ПРОВЕРКА СОВПАДЕНИЯ ПО rooms
+      var matchRooms = function (pin) {
+        return isFieldMatchFilter(pin.offer.rooms, tokyoFilters[2]);
       };
 
+      // ПРОВЕРКА СОВПАДЕНИЯ ПО guests
+      var matchGuests = function (pin) {
+        return isFieldMatchFilter(pin.offer.guests, tokyoFilters[3]);
+      };
+
+      // ПРОВЕРКА, СОДЕРЖИТ ЛИ pin ДАННЫЙ feature
       var isPinContainsFeature = function (pin, feature) {
         if (pin.offer.features.indexOf(feature) !== -1) {
           return true;
@@ -77,51 +78,61 @@
         return false;
       };
 
-      // ПРОВЕРКА КОЛИЧЕСТВА СОВПАДЕНИЙ ПО features
-      var getFeaturesMatchingRank = function (pin) {
-        var featuresRank = featuresInputs.length;
-
-        featuresInputs.forEach(function (featuresInput) {
-          if (featuresInput.checked === true && !isPinContainsFeature(pin, featuresInput.value)) {
-            featuresRank--;
+      // ПРОВЕРКА СОВПАДЕНИЯ ПО features
+      var matchFeatures = function (pin) {
+        for (var i = 0; i < featuresInputs.length; i++) {
+          if (featuresInputs[i].checked && !isPinContainsFeature(pin, featuresInputs[i].value)) {
+            return false;
           }
-        });
+        }
 
-        return featuresRank;
+        return true;
       };
 
-      var filteredPins = pins.filter(function (it) {
-        return isMatching(it);
-      });
+      // ПОЛУЧИТЬ ОТФИЛЬТРОВАННЫЙ МАССИВ ОБНОВЛЕНИЙ
+      var getFilteredArray = function () {
+        var pins = data.slice();
 
-      window.generateMap.addPinMarksOnMap(filteredPins);
+        var matchFunctions = [
+          matchType,
+          matchPrice,
+          matchRooms,
+          matchGuests,
+          matchFeatures
+        ];
+
+        for (var i = 0; i < matchFunctions.length; i++) {
+          if (pins.length === 0) {
+            return pins;
+          }
+          pins = filterArray(pins, matchFunctions[i]);
+        }
+
+        return pins;
+      };
+
+      window.generateMap.updatePinMarksOnMap(getFilteredArray());
 
     };
 
-    // ДОБАВЛЕНИЕ СЛУШАТЕЛЕЙ ДЛЯ select
-    tokyoFilters.forEach(function (tokyoFilter) {
-      tokyoFilter.addEventListener('change', function () {
-        window.debounce(updatePins);
+    var filterArray = function (array, callback) {
+      return array.filter(function (arrElem) {
+        return callback(arrElem);
       });
-    });
-
-    // ДОБАВЛЕНИЕ СЛУШАТЕЛЕЙ ДЛЯ featuresInputs
-    featuresInputs.forEach(function (featuresInput) {
-      featuresInput.addEventListener('change', function () {
-        window.debounce(updatePins);
-      });
-    });
-
-    var onDataLoad = function (data) {
-      pins = data;
-      updatePins();
     };
 
-    var onDataError = function (errorMessage) {
-      window.generateMap.showErrorMessage(errorMessage);
+    var addListenersToInputs = function (inputs) {
+      inputs.forEach(function (input) {
+        input.addEventListener('change', function () {
+          window.utils.debounce(updatePins);
+        });
+      });
     };
 
-    window.load(DATA_URL, onDataLoad, onDataError);
+    addListenersToInputs(tokyoFilters);
+    addListenersToInputs(featuresInputs);
+
+    updatePins();
 
   };
 

@@ -12,6 +12,8 @@ window.generateMap = (function () {
   var MIN_Y = 94;
   var MAX_Y = tokyo.offsetHeight - filtersHeight;
 
+  var DATA_URL = 'https://intensive-javascript-server-kjgvxfepjl.now.sh/keksobooking/data';
+
   // ДОБАВЛЕНИЕ РАЗМЕТКИ PIN НА КАРТУ
   var addPinMarkOnMap = function (pin) {
     pinMap.appendChild(window.generatePin.createPinMark(pin));
@@ -81,12 +83,26 @@ window.generateMap = (function () {
 
   });
 
+  var onLoadData = function (data) {
+    window.setMapFilters(data);
+  };
+
+  var onDataError = function (errorMessage) {
+    var errorMarkTemplate = document.querySelector('#error-template');
+    var errorMarkElement = errorMarkTemplate.content.cloneNode(true);
+
+    var errorMessageDiv = errorMarkElement.querySelector('.error-message');
+    errorMessageDiv.textContent = errorMessage;
+
+    tokyo.appendChild(errorMarkElement);
+  };
+
   var initMap = function () {
     window.initCard.closeDialog();
-    window.setMapFilters();
     window.initForm(pinMain.offsetLeft + pinMainWidth / 2, pinMain.offsetTop + MIN_Y);
   };
 
+  window.load(DATA_URL, onLoadData, onDataError);
   initMap();
 
   return {
@@ -95,23 +111,14 @@ window.generateMap = (function () {
       pinMain.style.top = pinMainTop - MIN_Y + 'px';
     },
 
-    showErrorMessage: function (errorMessage) {
-      var errorMarkTemplate = document.querySelector('#error-template');
-      var errorMarkElement = errorMarkTemplate.content.cloneNode(true);
+    updatePinMarksOnMap: function (data) {
 
-      var errorMessageDiv = errorMarkElement.querySelector('.error-message');
-      errorMessageDiv.textContent = errorMessage;
-
-      tokyo.appendChild(errorMarkElement);
-    },
-
-    addPinMarksOnMap: function (pins) {
       for (var i = pinMap.children.length - 1; i > 0; i--) {
         pinMap.children[i].remove();
       }
 
-      for (i = 0; i < pins.length; i++) {
-        addPinMarkOnMap(pins[i]);
+      for (i = 0; i < data.length; i++) {
+        addPinMarkOnMap(data[i]);
       }
 
     },

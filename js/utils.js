@@ -2,6 +2,9 @@
 
 window.utils = (function () {
 
+  var DEBOUNCE_INTERVAL = 500;
+  var lastTimeout;
+
   return {
     // ПОЛУЧЕНИЕ СЛУЧАЙНОГО ЧИСЛА
     getRandomIntNumber: function (min, max) {
@@ -16,6 +19,14 @@ window.utils = (function () {
     // ПРОВЕРКА НАЖАТИЯ НА ENTER
     isEnterPress: function (evt) {
       return evt.keyCode === 13;
+    },
+
+    // ИЗБАВЛЕНИЕ ОТ ДРЕБЕЗГ
+    debounce: function (callback) {
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(callback, DEBOUNCE_INTERVAL);
     }
 
   };
