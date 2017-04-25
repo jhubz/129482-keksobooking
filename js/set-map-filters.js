@@ -1,6 +1,6 @@
 'use strict';
 
-(function () {
+window.setMapFilters = (function () {
 
   var tokyoFiltersContainer = document.querySelector('.tokyo__filters');
   var typeFilter = tokyoFiltersContainer.querySelector('#housing_type');
@@ -47,11 +47,9 @@
     };
 
     var pinPrice = pin.offer.price;
-    var minFilterPrice = prices[getSelectedValue()].min;
-    var maxFilterPrice = prices[getSelectedValue()].max;
+    var priceRange = prices[getSelectedValue()];
 
-    return pinPrice >= minFilterPrice && pinPrice <= maxFilterPrice;
-
+    return pinPrice >= priceRange.min && pinPrice <= priceRange.max;
   };
 
   // ПРОВЕРКА СОВПАДЕНИЯ ПО rooms
@@ -64,24 +62,6 @@
     return isFieldMatchFilter(pin.offer.guests, guestsFilter);
   };
 
-  // ПРОВЕРКА, СОДЕРЖИТ ЛИ pin ДАННЫЙ feature
-  var isPinContainsFeature = function (pin, feature) {
-    return pin.offer.features.indexOf(feature) !== -1;
-  };
-
-  // ПРОВЕРКА СОВПАДЕНИЯ ПО features
-  var matchFeatures = function (pin) {
-    var mismatchFeatures = 0;
-    [].forEach.call(featuresInputs, function (input) {
-      if (input.checked && !isPinContainsFeature(pin, input.value)) {
-        mismatchFeatures++;
-      }
-    });
-
-    return mismatchFeatures === 0;
-
-  };
-
   // ФИЛЬТРАЦИЯ МАССИВА
   var filterArray = function (array, callback) {
     return array.filter(function (arrElem) {
@@ -89,9 +69,25 @@
     });
   };
 
-  // ЗАДАТЬ ФИЛЬРЫ ДЛЯ ОБЪЯВЛЕНИЙ
-  window.setMapFilters = function (data) {
+  // ПРОВЕРКА СОВПАДЕНИЯ filter feature С pin features
+  var matchFeature = function (pin, feature) {
+    var checkedInput = featuresContainer.querySelector('input[value=' + feature + ']:checked');
 
+    if (!checkedInput) {
+      return true;
+    }
+
+    return pin.offer.features.indexOf(checkedInput.value) !== -1;
+  };
+
+  // ФИЛЬТРАЦИЯ МАССИВА ПО feature
+  var filterArrayByFeature = function (array, feature) {
+    return array.filter(function (arrElem) {
+      return matchFeature(arrElem, feature);
+    });
+  };
+
+  return function (data) {
     // ОБНОВЛЕНИЕ pins
     var updatePins = function () {
       var pins = data.slice();
@@ -100,10 +96,15 @@
       pins = filterArray(pins, matchPrice);
       pins = filterArray(pins, matchRooms);
       pins = filterArray(pins, matchGuests);
-      pins = filterArray(pins, matchFeatures);
+
+      pins = filterArrayByFeature(pins, 'wifi');
+      pins = filterArrayByFeature(pins, 'dishwasher');
+      pins = filterArrayByFeature(pins, 'parking');
+      pins = filterArrayByFeature(pins, 'washer');
+      pins = filterArrayByFeature(pins, 'elevator');
+      pins = filterArrayByFeature(pins, 'conditioner');
 
       window.generateMap.updatePinMarksOnMap(pins);
-
     };
 
     var addListenerToSelect = function (select) {
@@ -128,7 +129,6 @@
     addListenersToInputs(featuresInputs);
 
     updatePins();
-
   };
 
 })();

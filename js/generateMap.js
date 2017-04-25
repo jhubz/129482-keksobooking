@@ -113,7 +113,7 @@ window.generateMap = (function () {
         pin.remove();
       });
 
-      if (data.length > 0) {
+      if (data) {
         data.forEach(function (pin) {
           fragment.appendChild(window.generatePin.createPinMark(pin));
           pinMap.appendChild(fragment);
