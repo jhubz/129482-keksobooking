@@ -36,14 +36,14 @@ window.initCard = (function () {
     var featureElement;
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < pinFeaturesArray.length; i++) {
+    pinFeaturesArray.forEach(function (feature) {
       featureElement = document.createElement('span');
 
       featureElement.classList.add('feature__image');
-      featureElement.classList.add('feature__image--' + pinFeaturesArray[i]);
+      featureElement.classList.add('feature__image--' + feature);
 
       fragment.appendChild(featureElement);
-    }
+    });
 
     return fragment;
   };
@@ -52,16 +52,16 @@ window.initCard = (function () {
     var photosElement;
     var fragment = document.createDocumentFragment();
 
-    for (var i = 0; i < pinPhotosArray.length; i++) {
+    pinPhotosArray.forEach(function (photo) {
       photosElement = document.createElement('img');
 
-      photosElement.setAttribute('src', pinPhotosArray[i]);
+      photosElement.setAttribute('src', photo);
       photosElement.setAttribute('alt', 'Lodge photo');
       photosElement.setAttribute('width', '52');
       photosElement.setAttribute('height', '42');
 
       fragment.appendChild(photosElement);
-    }
+    });
 
     return fragment;
   };

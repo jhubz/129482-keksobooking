@@ -14,11 +14,6 @@ window.generateMap = (function () {
 
   var DATA_URL = 'https://intensive-javascript-server-kjgvxfepjl.now.sh/keksobooking/data';
 
-  // ДОБАВЛЕНИЕ РАЗМЕТКИ PIN НА КАРТУ
-  var addPinMarkOnMap = function (pin) {
-    pinMap.appendChild(window.generatePin.createPinMark(pin));
-  };
-
   // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ СМЕЩЕНИЯ ОБЪЕКТА, УЧИТЫВАЯ ГРАНИЦЫ
   var getElementOffsets = function (elementOffsetsX, elementOffsetsY) {
     if (elementOffsetsX < MIN_X) {
@@ -80,7 +75,6 @@ window.generateMap = (function () {
 
     document.addEventListener('mousemove', onPinMainMouseMove);
     document.addEventListener('mouseup', onPinMainMouseUp);
-
   });
 
   var onLoadData = function (data) {
@@ -112,19 +106,23 @@ window.generateMap = (function () {
     },
 
     updatePinMarksOnMap: function (data) {
+      var pinsOnMap = pinMap.querySelectorAll('.pin:not(.pin__main)');
+      var fragment = document.createDocumentFragment();
 
-      for (var i = pinMap.children.length - 1; i > 0; i--) {
-        pinMap.children[i].remove();
-      }
+      [].forEach.call(pinsOnMap, function (pin) {
+        pin.remove();
+      });
 
-      for (i = 0; i < data.length; i++) {
-        addPinMarkOnMap(data[i]);
+      if (data.length > 0) {
+        data.forEach(function (pin) {
+          fragment.appendChild(window.generatePin.createPinMark(pin));
+          pinMap.appendChild(fragment);
+        });
       }
 
     },
 
     getElementOffsets: getElementOffsets
-
   };
 
 })();

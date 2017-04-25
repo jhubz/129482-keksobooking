@@ -80,9 +80,9 @@ window.initForm = (function () {
   var removeFormFieldsInvalidStatus = function () {
     var invalidFields = noticeForm.querySelectorAll('.invalid');
 
-    for (var i = 0; i < invalidFields.length; i++) {
-      invalidFields[i].classList.remove('invalid');
-    }
+    [].forEach.call(invalidFields, function (invalidField) {
+      invalidField.classList.remove('invalid');
+    });
   };
 
   // ДОБАВЛЕНИЕ ВАЛИДАЦИИ ФОРМЫ NOTICE
