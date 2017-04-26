@@ -1,8 +1,6 @@
 'use strict';
 
 window.utils = (function () {
-
-  var DEBOUNCE_INTERVAL = 500;
   var lastTimeout;
 
   return {
@@ -21,12 +19,12 @@ window.utils = (function () {
       return evt.keyCode === 13;
     },
 
-    // ИЗБАВЛЕНИЕ ОТ ДРЕБЕЗГ
-    debounce: function (callback) {
+    // ИЗБАВЛЕНИЕ ОТ СЛИШКОМ ЧАСТОГО ОБНОВЛЕНИЯ pins
+    debounce: function (debounceInterval, callback) {
       if (lastTimeout) {
         window.clearTimeout(lastTimeout);
       }
-      lastTimeout = window.setTimeout(callback, DEBOUNCE_INTERVAL);
+      lastTimeout = window.setTimeout(callback, debounceInterval);
     }
 
   };
