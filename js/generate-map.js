@@ -4,31 +4,35 @@ window.generateMap = (function () {
   var tokyo = document.querySelector('.tokyo');
   var pinMap = tokyo.querySelector('.tokyo__pin-map');
   var pinMain = pinMap.querySelector('.pin__main');
-  var pinMainWidth = 75;
-  var filtersHeight = 46;
+
+  var PIN_MAIN_WIDTH = 75;
+  var FILTERS_HEIGHT = 46;
 
   var MIN_X = 0;
   var MAX_X = tokyo.offsetWidth;
   var MIN_Y = 94;
-  var MAX_Y = tokyo.offsetHeight - filtersHeight;
+  var MAX_Y = tokyo.offsetHeight - FILTERS_HEIGHT;
 
   var DATA_URL = 'https://intensive-javascript-server-kjgvxfepjl.now.sh/keksobooking/data';
 
   // ПОЛУЧЕНИЕ ЗНАЧЕНИЯ СМЕЩЕНИЯ ОБЪЕКТА, УЧИТЫВАЯ ГРАНИЦЫ
-  var getElementOffsets = function (elementOffsetsX, elementOffsetsY) {
-    if (elementOffsetsX < MIN_X) {
-      elementOffsetsX = MIN_X;
-    } else if (elementOffsetsX > MAX_X) {
-      elementOffsetsX = MAX_X;
+  var getElementOffsets = function (elementOffsetX, elementOffsetY) {
+    if (elementOffsetX < MIN_X) {
+      elementOffsetX = MIN_X;
+    } else if (elementOffsetX > MAX_X) {
+      elementOffsetX = MAX_X;
     }
 
-    if (elementOffsetsY < MIN_Y) {
-      elementOffsetsY = MIN_Y;
-    } else if (elementOffsetsY > MAX_Y) {
-      elementOffsetsY = MAX_Y;
+    if (elementOffsetY < MIN_Y) {
+      elementOffsetY = MIN_Y;
+    } else if (elementOffsetY > MAX_Y) {
+      elementOffsetY = MAX_Y;
     }
 
-    return [elementOffsetsX, elementOffsetsY];
+    return {
+      x: elementOffsetX,
+      y: elementOffsetY
+    };
   };
 
   // ДОБАВЛЕНИЕ ПЕРЕДВИЖЕНИЯ К ГЛАВНОМУ PIN'У
@@ -49,20 +53,20 @@ window.generateMap = (function () {
         y: startCoords.y - moveEvt.pageY
       };
 
-      var mainPinLeft = pinMain.offsetLeft - shift.x + pinMainWidth / 2;
-      var mainPinTop = pinMain.offsetTop - shift.y + MIN_Y;
+      var pinMainLeft = pinMain.offsetLeft - shift.x + PIN_MAIN_WIDTH / 2;
+      var pinMainTop = pinMain.offsetTop - shift.y + MIN_Y;
 
-      var pinMainOffsets = getElementOffsets(mainPinLeft, mainPinTop);
+      var pinMainOffsets = getElementOffsets(pinMainLeft, pinMainTop);
 
       startCoords = {
         x: moveEvt.pageX,
         y: moveEvt.pageY
       };
 
-      pinMain.style.left = pinMainOffsets[0] - (pinMainWidth / 2) + 'px';
-      pinMain.style.top = pinMainOffsets[1] - MIN_Y + 'px';
+      pinMain.style.left = pinMainOffsets.x - (PIN_MAIN_WIDTH / 2) + 'px';
+      pinMain.style.top = pinMainOffsets.y - MIN_Y + 'px';
 
-      window.initForm(pinMainOffsets[0], pinMainOffsets[1]);
+      window.initForm(pinMainOffsets.x, pinMainOffsets.y);
     };
 
     // ОБРАБОТЧИК mouseup ПРИ ЗАВЕРШЕНИИ ПЕРЕТАСКИВАНИЯ pin-main
@@ -76,6 +80,27 @@ window.generateMap = (function () {
     document.addEventListener('mousemove', onPinMainMouseMove);
     document.addEventListener('mouseup', onPinMainMouseUp);
   });
+
+  var updatePinMarksOnMap = function (data) {
+    var pinsOnMap = pinMap.querySelectorAll('.pin:not(.pin__main)');
+    var fragment = document.createDocumentFragment();
+
+    [].forEach.call(pinsOnMap, function (pin) {
+      pin.remove();
+    });
+
+    if (data) {
+      data.forEach(function (pin) {
+        fragment.appendChild(window.generatePin.createPinMark(pin));
+        pinMap.appendChild(fragment);
+      });
+    }
+  };
+
+  var setPinMainPosition = function (pinMainOffsetX, pinMainOffsetY) {
+    pinMain.style.left = pinMainOffsetX - PIN_MAIN_WIDTH / 2 + 'px';
+    pinMain.style.top = pinMainOffsetY - MIN_Y + 'px';
+  };
 
   var onLoadData = function (data) {
     window.setMapFilters(data);
@@ -91,37 +116,12 @@ window.generateMap = (function () {
     tokyo.appendChild(errorMarkElement);
   };
 
-  var initMap = function () {
-    window.initCard.closeDialog();
-    window.initForm(pinMain.offsetLeft + pinMainWidth / 2, pinMain.offsetTop + MIN_Y);
-  };
-
+  window.initCard.closeDialog();
   window.load(DATA_URL, onLoadData, onDataError);
-  initMap();
 
   return {
-    setPinMainOffset: function (pinMainLeft, pinMainTop) {
-      pinMain.style.left = pinMainLeft - pinMainWidth / 2 + 'px';
-      pinMain.style.top = pinMainTop - MIN_Y + 'px';
-    },
-
-    updatePinMarksOnMap: function (data) {
-      var pinsOnMap = pinMap.querySelectorAll('.pin:not(.pin__main)');
-      var fragment = document.createDocumentFragment();
-
-      [].forEach.call(pinsOnMap, function (pin) {
-        pin.remove();
-      });
-
-      if (data) {
-        data.forEach(function (pin) {
-          fragment.appendChild(window.generatePin.createPinMark(pin));
-          pinMap.appendChild(fragment);
-        });
-      }
-
-    },
-
+    setPinMainPosition: setPinMainPosition,
+    updatePinMarksOnMap: updatePinMarksOnMap,
     getElementOffsets: getElementOffsets
   };
 

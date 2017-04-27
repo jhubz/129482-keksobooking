@@ -7,7 +7,7 @@ window.setMapFilters = (function () {
   var roomsFilter = tokyoFiltersForm.querySelector('#housing_room-number');
   var guestsFilter = tokyoFiltersForm.querySelector('#housing_guests-number');
 
-  var featuresContainer = tokyoFiltersForm.querySelector('.tokyo__filter-set');
+  var pinsData;
 
   // ПРОВЕРКА СОВПАДЕНИЯ ПОЛЯ pin С ПОЛЕМ ФИЛЬТРА
   var isFieldMatchFilter = function (pinField, filter) {
@@ -52,33 +52,33 @@ window.setMapFilters = (function () {
   // ФИЛЬТРАЦИЯ МАССИВА ПО feature
   var filterArrayByFeature = function (array, feature) {
     return array.filter(function (arrElem) {
-      var features = arrElem.offer.features;
-      return features.includes(feature);
+      return arrElem.offer.features.includes(feature);
     });
   };
 
-  return function (data) {
-    // ОБНОВЛЕНИЕ pins
-    var updatePins = function () {
-      var pins = data.slice();
-      var checkedInputs = featuresContainer.querySelectorAll('input:checked');
+  // ОБНОВЛЕНИЕ pins
+  var updatePins = function () {
+    var pins = pinsData.slice();
+    var checkedInputs = tokyoFiltersForm.querySelectorAll('input[name="feature"]:checked');
 
-      pins = filterArray(pins, matchType);
-      pins = filterArray(pins, matchPrice);
-      pins = filterArray(pins, matchRooms);
-      pins = filterArray(pins, matchGuests);
+    pins = filterArray(pins, matchType);
+    pins = filterArray(pins, matchPrice);
+    pins = filterArray(pins, matchRooms);
+    pins = filterArray(pins, matchGuests);
 
-      [].forEach.call(checkedInputs, function (checkedInput) {
-        pins = filterArrayByFeature(pins, checkedInput.value);
-      });
-
-      window.generateMap.updatePinMarksOnMap(pins);
-    };
-
-    tokyoFiltersForm.addEventListener('change', function () {
-      window.utils.debounce(500, updatePins);
+    [].forEach.call(checkedInputs, function (input) {
+      pins = filterArrayByFeature(pins, input.value);
     });
 
+    window.generateMap.updatePinMarksOnMap(pins);
+  };
+
+  tokyoFiltersForm.addEventListener('change', function () {
+    window.utils.debounce(updatePins, 500);
+  });
+
+  return function (data) {
+    pinsData = data;
     updatePins();
   };
 

@@ -27,7 +27,7 @@ window.initCard = (function () {
   };
 
   // УДАЛЕНИЕ ВСЕХ ДОЧЕРНИХ ЭЛЕМЕНТОВ
-  var removeAllChild = function (element) {
+  var removeAllChildren = function (element) {
     element.innerHTML = null;
   };
 
@@ -81,6 +81,12 @@ window.initCard = (function () {
 
   // ЗАПОЛНЕНИЕ ДИАЛОГА ИНФОРМАЦИЕЙ
   var fillDialogFields = function (pin) {
+
+    var refillElement = function (element, array, callback) {
+      removeAllChildren(element);
+      element.appendChild(callback(array));
+    };
+
     title.textContent = pin.offer.title;
     titleImage.setAttribute('src', pin.author.avatar);
 
@@ -90,13 +96,11 @@ window.initCard = (function () {
     guestsRooms.textContent = 'Для ' + pin.offer.guests + ' гостей в ' + pin.offer.rooms + ' комнатах';
     checkinOut.textContent = 'Заезд после ' + pin.offer.checkin + ', выезд до ' + pin.offer.checkout;
 
-    removeAllChild(features);
-    features.appendChild(createPinFeaturesMark(pin.offer.features));
+    refillElement(features, pin.offer.features, createPinFeaturesMark);
 
     description.textContent = pin.offer.description;
 
-    removeAllChild(photos);
-    photos.appendChild(createPinPhotosMark(pin.offer.photos));
+    refillElement(photos, pin.offer.photos, createPinPhotosMark);
   };
 
   // ЗАКРЫТИЕ ДИАЛОГА ПРИ НАЖАТИИ ESC
@@ -132,14 +136,14 @@ window.initCard = (function () {
     hideElement(dialog);
   };
 
+  var showDialog = function (evt, pin) {
+    fillDialogFields(pin);
+    openDialog(evt);
+  };
+
   return {
     closeDialog: closeDialog,
-
-    showDialog: function (evt, pin) {
-      fillDialogFields(pin);
-      openDialog(evt);
-    }
-
+    showDialog: showDialog
   };
 
 })();
