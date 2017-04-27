@@ -25,7 +25,7 @@ window.generatePin = (function () {
   };
 
   // ДОБАВЛЕНИЕ СЛУШАТЕЛЕЙ К PIN
-  var addListenerToPinMark = function (pinMark, pin) {
+  var addListenersToPinMark = function (pinMark, pin) {
     pinMark.addEventListener('click', function (evt) {
       onPinClick(evt, pin);
     });
@@ -37,27 +37,28 @@ window.generatePin = (function () {
     });
   };
 
+  // СОЗДАНИЕ РАЗМЕТКИ ОБЪЯВЛЕНИЯ
+  var createPinMark = function (pin) {
+    var pinMarkTemplate = document.querySelector('#pin-template');
+    var pinMarkElement = pinMarkTemplate.content.cloneNode(true);
+
+    var pinMark = pinMarkElement.querySelector('.pin');
+    var pinMarkImage = pinMark.querySelector('img');
+
+    var pinMarkWidth = 56;
+    var pinMarkHeight = 75;
+    var pinMarkStyle = 'left: ' + (pin.location.x - pinMarkWidth / 2) + 'px; top: ' + (pin.location.y - pinMarkHeight) + 'px';
+
+    pinMark.setAttribute('style', pinMarkStyle);
+    pinMarkImage.setAttribute('src', pin.author.avatar);
+
+    addListenersToPinMark(pinMark, pin);
+
+    return pinMarkElement;
+  };
+
   return {
-    // СОЗДАНИЕ РАЗМЕТКИ ОБЪЯВЛЕНИЯ
-    createPinMark: function (pin) {
-      var pinMarkTemplate = document.querySelector('#pin-template');
-      var pinMarkElement = pinMarkTemplate.content.cloneNode(true);
-
-      var pinMark = pinMarkElement.querySelector('.pin');
-      var pinMarkImage = pinMark.querySelector('img');
-
-      var pinMarkWidth = 56;
-      var pinMarkHeight = 75;
-      var pinMarkStyle = 'left: ' + (pin.location.x - pinMarkWidth / 2) + 'px; top: ' + (pin.location.y - pinMarkHeight) + 'px';
-
-      pinMark.setAttribute('style', pinMarkStyle);
-      pinMarkImage.setAttribute('src', pin.author.avatar);
-
-      addListenerToPinMark(pinMark, pin);
-
-      return pinMarkElement;
-    },
-
+    createPinMark: createPinMark,
     unActivateSelectedPin: unActivateSelectedPin
   };
 

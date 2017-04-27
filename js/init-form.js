@@ -8,16 +8,9 @@ window.initForm = (function () {
   var noticeFormPrice = noticeForm.querySelector('#price');
   var noticeFormRoomNumber = noticeForm.querySelector('#room_number');
   var noticeFormCapacity = noticeForm.querySelector('#capacity');
-  var address = noticeForm.querySelector('#address');
+  var noticeFormAddress = noticeForm.querySelector('#address');
   var noticeFormTime = noticeForm.querySelector('#time');
   var noticeFormTimeout = noticeForm.querySelector('#timeout');
-
-  var DEFAULT_TITLE_VALUE = '';
-  var DEFAULT_TYPE_VALUE = 'flat';
-  var DEFAULT_PRICE_VALUE = 1000;
-  var DEFAULT_ROOM_NUMBER_VALUE = '1';
-  var DEFAULT_CAPACITY_VALUE = '0';
-  var DEFAULT_TIME_VALUE = '12';
 
   // ДОБАВЛЕНИЕ АТРИБУТОВ ДЛЯ ВАЛИДАЦИИ ФОРМЫ
   var addValidityAttributesToNoticeForm = function () {
@@ -29,17 +22,8 @@ window.initForm = (function () {
     noticeFormPrice.setAttribute('value', 1000);
     noticeFormPrice.setAttribute('min', 1000);
     noticeFormPrice.setAttribute('max', 1000000);
-  };
 
-  // ЗАПОЛНЕНИЕ ФОРМЫ ЗНАЧЕНИЯМИ ПО УМОЛЧАНИЮ
-  var fillNoticeFormDefaultValues = function () {
-    noticeFormTitle.value = DEFAULT_TITLE_VALUE;
-    noticeFormType.value = DEFAULT_TYPE_VALUE;
-    noticeFormPrice.value = DEFAULT_PRICE_VALUE;
-    noticeFormRoomNumber.value = DEFAULT_ROOM_NUMBER_VALUE;
-    noticeFormCapacity.value = DEFAULT_CAPACITY_VALUE;
-    noticeFormTime.value = DEFAULT_TIME_VALUE;
-    noticeFormTimeout.value = DEFAULT_TIME_VALUE;
+    noticeFormAddress.setAttribute('required', 'required');
   };
 
   // ДОБАВЛЕНИЕ СИНХРОНИЗАЦИИ К ПОЛЯМ ФОРМЫ
@@ -80,46 +64,53 @@ window.initForm = (function () {
   var removeFormFieldsInvalidStatus = function () {
     var invalidFields = noticeForm.querySelectorAll('.invalid');
 
-    for (var i = 0; i < invalidFields.length; i++) {
-      invalidFields[i].classList.remove('invalid');
-    }
+    [].forEach.call(invalidFields, function (invalidField) {
+      invalidField.classList.remove('invalid');
+    });
   };
 
   // ДОБАВЛЕНИЕ ВАЛИДАЦИИ ФОРМЫ NOTICE
   var addNoticeFormValidation = function () {
+
     noticeForm.addEventListener('invalid', function (evt) {
       evt.preventDefault();
       addFormFieldInvalidStatus(evt.target);
     }, true);
 
+
     noticeForm.addEventListener('submit', function (evt) {
       evt.preventDefault();
       removeFormFieldsInvalidStatus();
-      fillNoticeFormDefaultValues();
+      noticeForm.reset();
+      noticeFormPrice.setAttribute('min', 1000);
     });
   };
 
   // ПОЛУЧЕНИЕ ЧИСЛА ИЗ СТРОКИ
   var getNumberFromString = function (string) {
-    return +string.match(/\d+\.\d+/) || +string.match(/\d+/);
+    return parseInt(string.match(/\d+\.\d+/), 10) || parseInt(string.match(/\d+/), 10);
   };
 
   var setAddress = function (left, top) {
-    address.value = 'x: ' + left + ', y: ' + top;
+    noticeFormAddress.value = 'x: ' + left + ', y: ' + top;
   };
 
   // ДОБАВЛЕНИЕ СЛУШАТЕЛЯ К ПОЛЮ ADDRESS
-  address.addEventListener('change', function () {
-    var coords = address.value.split(', ');
-    var resultCoords = window.generateMap.getElementOffsets(getNumberFromString(coords[0]), getNumberFromString(coords[1]));
-    setAddress(resultCoords[0], resultCoords[1]);
-    window.generateMap.setPinMainOffset(resultCoords[0], resultCoords[1]);
+  noticeFormAddress.addEventListener('change', function () {
+    var stringCoords = noticeFormAddress.value.split(', ');
+
+    var coordX = getNumberFromString(stringCoords[0]);
+    var coordY = getNumberFromString(stringCoords[1]);
+
+    var pinMainOffsets = window.generateMap.getElementOffsets(coordX, coordY);
+
+    setAddress(pinMainOffsets.x, pinMainOffsets.y);
+    window.generateMap.setPinMainPosition(pinMainOffsets.x, pinMainOffsets.y);
   });
 
   // ДОБАВЛЕНИЕ ФУНКЦИОНАЛА К ФОРМЫ NOTICE
   var addFunctionalToNoticeForm = function () {
     addValidityAttributesToNoticeForm();
-    fillNoticeFormDefaultValues();
     addSyncToNoticeFormFields();
 
     addNoticeFormValidation();
