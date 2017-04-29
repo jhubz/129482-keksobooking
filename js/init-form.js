@@ -12,16 +12,24 @@ window.initForm = (function () {
   var noticeFormTime = noticeForm.querySelector('#time');
   var noticeFormTimeout = noticeForm.querySelector('#timeout');
 
+  var DEFAULT_PRICE_MIN = 1000;
+
   // ДОБАВЛЕНИЕ АТРИБУТОВ ДЛЯ ВАЛИДАЦИИ ФОРМЫ
   var addValidityAttributesToNoticeForm = function () {
+    var DEFAULT_TITLE_MINLENGTH = 30;
+    var DEFAULT_TITLE_MAXLENGTH = 100;
+
+    var DEFAULT_PRICE_VALUE = 1000;
+    var DEFAULT_PRICE_MAX = 1000000;
+
     noticeFormTitle.setAttribute('required', 'required');
-    noticeFormTitle.setAttribute('minlength', 30);
-    noticeFormTitle.setAttribute('maxlength', 100);
+    noticeFormTitle.setAttribute('minlength', DEFAULT_TITLE_MINLENGTH);
+    noticeFormTitle.setAttribute('maxlength', DEFAULT_TITLE_MAXLENGTH);
 
     noticeFormPrice.setAttribute('required', 'required');
-    noticeFormPrice.setAttribute('value', 1000);
-    noticeFormPrice.setAttribute('min', 1000);
-    noticeFormPrice.setAttribute('max', 1000000);
+    noticeFormPrice.setAttribute('value', DEFAULT_PRICE_VALUE);
+    noticeFormPrice.setAttribute('min', DEFAULT_PRICE_MIN);
+    noticeFormPrice.setAttribute('max', DEFAULT_PRICE_MAX);
 
     noticeFormAddress.setAttribute('required', 'required');
   };
@@ -46,6 +54,7 @@ window.initForm = (function () {
     var setMinValueToElement = function (element, value) {
       element.value = value;
       element.setAttribute('min', value);
+      element.classList.remove('invalid');
     };
 
     window.synchronizeFields(noticeFormType, noticeFormPrice, types, minPrices, setMinValueToElement);
@@ -60,53 +69,69 @@ window.initForm = (function () {
     invalidField.classList.add('invalid');
   };
 
-  // УДАЛЕНИЕ КРАСНОЙ РАМКИ СО ВСЕХ ПОЛЕЙ ФОРМЫ
-  var removeFormFieldsInvalidStatus = function () {
-    var invalidFields = noticeForm.querySelectorAll('.invalid');
-
-    [].forEach.call(invalidFields, function (invalidField) {
-      invalidField.classList.remove('invalid');
-    });
-  };
-
   // ДОБАВЛЕНИЕ ВАЛИДАЦИИ ФОРМЫ NOTICE
   var addNoticeFormValidation = function () {
 
+    var onFieldValueChange = function (evt) {
+      evt.target.classList.remove('invalid');
+      evt.target.removeEventListener('change', onFieldValueChange);
+    };
+
     noticeForm.addEventListener('invalid', function (evt) {
       evt.preventDefault();
-      addFormFieldInvalidStatus(evt.target);
-    }, true);
 
+      addFormFieldInvalidStatus(evt.target);
+      evt.target.addEventListener('change', onFieldValueChange);
+    }, true);
 
     noticeForm.addEventListener('submit', function (evt) {
       evt.preventDefault();
-      removeFormFieldsInvalidStatus();
+
       noticeForm.reset();
-      noticeFormPrice.setAttribute('min', 1000);
+      noticeFormPrice.setAttribute('min', DEFAULT_PRICE_MIN);
     });
+
   };
 
-  // ПОЛУЧЕНИЕ ЧИСЛА ИЗ СТРОКИ
-  var getNumberFromString = function (string) {
-    return parseInt(string.match(/\d+\.\d+/), 10) || parseInt(string.match(/\d+/), 10);
+  // ПОЛУЧЕНИЕ КООРДИНАТЫ ИЗ СТРОКИ
+  var getCoordFromString = function (string, axis) {
+    var reg = new RegExp('^' + axis + ':\\s\\d+\\.?\\d+$');
+
+    if (string && string.match(reg)) {
+      return parseFloat(string.match(/\d+\.?\d+/), 10);
+    }
+
+    return null;
   };
 
   var setAddress = function (left, top) {
     noticeFormAddress.value = 'x: ' + left + ', y: ' + top;
+    noticeFormAddress.classList.remove('invalid');
   };
 
   // ДОБАВЛЕНИЕ СЛУШАТЕЛЯ К ПОЛЮ ADDRESS
   noticeFormAddress.addEventListener('change', function () {
     var stringCoords = noticeFormAddress.value.split(', ');
 
-    var coordX = getNumberFromString(stringCoords[0]);
-    var coordY = getNumberFromString(stringCoords[1]);
+    var getCorrectCoord = function (coord) {
+      var defaultCoord = 0;
 
-    var pinMainOffsets = window.generateMap.getElementOffsets(coordX, coordY);
+      if (window.utils.isNumber(coord)) {
+        return coord;
+      }
+
+      return defaultCoord;
+    };
+
+    var coordX = getCoordFromString(stringCoords[0], 'x');
+    var coordY = getCoordFromString(stringCoords[1], 'y');
+
+    var pinMainOffsets = window.generateMap.getElementOffsets(getCorrectCoord(coordX), getCorrectCoord(coordY));
 
     setAddress(pinMainOffsets.x, pinMainOffsets.y);
     window.generateMap.setPinMainPosition(pinMainOffsets.x, pinMainOffsets.y);
   });
+
 
   // ДОБАВЛЕНИЕ ФУНКЦИОНАЛА К ФОРМЫ NOTICE
   var addFunctionalToNoticeForm = function () {

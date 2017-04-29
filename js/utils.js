@@ -3,6 +3,11 @@
 window.utils = (function () {
   var lastTimeout;
 
+  //  ПРОВЕРКА ЗНАЧЕНИЯ НА ЧИСЛО
+  var isNumber = function (value) {
+    return !isNaN(parseFloat(value)) && isFinite(value);
+  };
+
   // ПОЛУЧЕНИЕ СЛУЧАЙНОГО ЧИСЛА
   var getRandomIntNumber = function (min, max) {
     return Math.floor(Math.random() * (max + 1 - min) + min);
@@ -27,6 +32,7 @@ window.utils = (function () {
   };
 
   return {
+    isNumber: isNumber,
     getRandomIntNumber: getRandomIntNumber,
     isEscPress: isEscPress,
     isEnterPress: isEnterPress,

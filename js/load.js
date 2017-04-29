@@ -4,6 +4,8 @@
   window.load = function (url, onLoad, onError) {
     var xhr = new XMLHttpRequest();
 
+    var OK_STATUS = 200;
+
     xhr.responseType = 'json';
     xhr.timeout = 5000;
 
@@ -17,7 +19,7 @@
 
     // ПОДКЛЮЧЕНИЯ СЛУШАТЕЛЯ К ЗАГРУЗКЕ ДАННЫХ
     xhr.addEventListener('load', function () {
-      if (xhr.status === 200) {
+      if (xhr.status === OK_STATUS) {
         onLoad(xhr.response);
       } else {
         onError('Ошибка: ' + xhr.status + ' ' + xhr.statusText);

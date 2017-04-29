@@ -28,7 +28,7 @@ window.initCard = (function () {
 
   // УДАЛЕНИЕ ВСЕХ ДОЧЕРНИХ ЭЛЕМЕНТОВ
   var removeAllChildren = function (element) {
-    element.innerHTML = null;
+    element.innerHTML = '';
   };
 
   // СОЗДАНИЕ МАССИВА РАЗМЕТОК УДОБСТВ
