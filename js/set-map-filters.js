@@ -22,16 +22,16 @@ window.setMapFilters = (function () {
 
   // ПРОВЕРКА СОВПАДЕНИЯ ПО price
   var matchPrice = function (pin) {
-    var firstPricePoint = 10000;
-    var secondPricePoint = 50000;
+    var FIRST_PRICE_POINT = 10000;
+    var SECOND_PRICE_POINT = 50000;
 
     switch (priceFilter.value) {
       case 'low':
-        return pin.offer.price < firstPricePoint;
+        return pin.offer.price < FIRST_PRICE_POINT;
       case 'high':
-        return pin.offer.price > secondPricePoint;
+        return pin.offer.price > SECOND_PRICE_POINT;
       default:
-        return (pin.offer.price >= firstPricePoint) && (pin.offer.price <= secondPricePoint);
+        return (pin.offer.price >= FIRST_PRICE_POINT) && (pin.offer.price <= SECOND_PRICE_POINT);
     }
   };
 
